@@ -1,0 +1,737 @@
+/**
+ * General Styles
+ */
+
+body.NoScrolling {
+  overflow: hidden;
+}
+
+input.form-submit {
+  margin-top: 1rem
+}
+
+.red-text {
+  color: red;
+}
+
+.gray-text {
+  color: #888888;
+}
+
+.gray-text:hover {
+  color: #888888;
+  text-decoration: none;
+}
+
+.fieldset-wrapper {
+  margin-top: 0;
+}
+
+/**
+ * EDAN Data Container
+ */
+
+#description_content,
+#edan_data_container,
+#edan_images_container {
+  min-height: 390px;
+  padding: 2rem 1.0rem;
+  margin-top: 1.5rem;
+}
+
+#content h2 {
+  font-size: 1.3em;
+}
+
+/**
+ * EDAN Search Field
+ */
+
+.form-item-query-edan {
+  margin-top: 1rem;
+}
+
+a.search-edan-button {
+  padding: 8px 16px;
+  font-size: 0.85em;
+  border-radius: 4px;
+}
+
+a.edan-app-button {
+  float: left;
+  padding: 2px 6px;
+  font-size: 0.8em;
+  border-radius: 4px;
+  margin-top: 0.5em;
+  margin-right: 0.50em;
+  margin-bottom: 0.50em;
+}
+
+a.edan-app-button-link {
+  float: left;
+  font-size: 0.65rem;
+  padding: 1px 10px;
+  width: 8rem;
+}
+
+.edan-app-button-link-separator {
+  float: left;
+  padding: 4px 0 0 0;
+}
+
+input[id*="edit-query"],
+.form-text {
+  height: 24px;
+  font-size: 14px;
+  padding: 4px;
+}
+
+div[class*="form-item-query-edan"] {
+  margin: 0;
+}
+
+/**
+ * EDAN Search Results
+ */
+
+#edan_search_results_container,
+#edan_image_search_results_container {
+  float: left; 
+  overflow-y: auto; 
+  width: 45%;
+  max-width: 45%;
+  height: 400px; 
+  border: 5px solid #E2E2E2; 
+  padding: 0 0.75rem 0.75rem 0.75rem;
+  margin-top: 1rem;
+}
+
+#edan_image_search_results_container,
+#edan_dropped_images_container.component-images-container,
+#edan_dropped_images_container {
+  height: 922px; 
+}
+
+#edan_search_results,
+#edan_image_search_results {
+  margin-top: 3.5rem;
+}
+
+#edan_search_results ul,
+#edan_image_search_results ul,
+.gallery-record-container ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gallery-record-container ul li {
+  padding: 0;
+  list-style-position: inside;
+  line-height: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+#edan_search_results ul li,
+#edan_image_search_results ul li {
+  margin: 0.75rem 0;
+  padding: 0;
+  list-style-position: inside;
+  cursor: move;
+  line-height: 1.4;
+}
+
+#edan_search_results ul li div.key,
+.gallery-record-container ul li div.key {
+  font-weight: bold;
+  display: inline-block;
+  margin: 2px 0 0 0;
+}
+
+#edan_search_results ul li div.value,
+.gallery-record-container ul li div.value{
+  font-weight: normal;
+  display: inline-block;
+}
+
+#edan_search_results .result-total {
+  margin-top: 0;
+  color: #555;
+}
+
+#edan_search_results .preview_record {
+  font-weight: bold;
+}
+
+#edan_search_results dt {
+  margin-top: 1.0rem;
+}
+
+#edan_search_results dd.record-title {
+  font-weight: bold;
+}
+
+#edan_search_results dd {
+  margin-left: 0;
+  margin-bottom: 0;
+}
+
+.edan-header-container {
+  position: absolute;
+  width: 43%;
+  background-color: #fff;
+  height: 25px;
+  padding-top: 20px;
+  border-bottom: 1px solid #ccc;
+}
+
+.edan-header-container h2 {
+  margin-top: 0;
+  font-size: 1.25em;
+  color: #4A4A4A;
+}
+
+.edan-header-container-transparent {
+  background-color: transparent;
+}
+
+/**
+ * Image Results Grid
+ */
+
+div.single-image-container a {
+  display: inline-block;
+  margin-bottom: 8px;
+  width: calc(42% - 4px);
+  margin-left: 8px;
+  margin-right: 14px;
+}
+
+@media screen and (min-width: 60em) {
+  div.single-image-container a {
+    width: calc(28% - 6px);
+  }
+}
+
+div.single-image-container a figure {
+  display: block;
+  margin: 0px;
+}
+
+div.single-image-container a figure img {
+  vertical-align: text-top;
+}
+
+/**
+ * Preview EDAN Record
+ */
+
+#preview_record_result h3 {
+  color: #444444;
+  margin-top: 8px;
+}
+
+#preview_record_result {
+  margin-top: 1rem;
+  float: right;
+  width: 48%;
+}
+
+/**
+ * EDAN Dropped Items
+ */
+
+#edan_dropped_items_container,
+#edan_dropped_images_container {
+  float: right;
+  overflow: hidden;
+  width: 45%;
+  max-width: 45%;
+  border: 5px solid #E2E2E2;
+  padding: 0 0.75rem 0.75rem 0.75rem;
+  margin-top: 1rem;
+  display: block;
+}
+
+#edan_dropped_items_container {
+  height: 400px;
+}
+
+#edan_dropped_image_container {
+  float: right;
+  width: 45%;
+  max-width: 45%;
+  height: 285px;
+  border: 5px solid #E2E2E2;
+  padding: 0 0.75rem 0.75rem 0.75rem;
+  margin-top: 1rem;
+}
+
+#edan_dropped_items,
+#edan_dropped_images,
+#edan_dropped_image {
+  margin-top: 3.5rem;
+}
+
+#edan_dropped_images {
+  height: 880px;
+  overflow-y: scroll;
+}
+
+#edan_dropped_items ol {
+  margin-left: 1.3em;
+}
+
+#edan_dropped_images ul,
+#edan_dropped_image ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+#edan_dropped_items ol {
+  height: 290px;
+  margin-top: 20px;
+}
+
+#edan_dropped_images ul {
+  min-height: 600px;
+}
+
+#edan_dropped_images_container.component-images-container #edan_dropped_images ul {
+  min-height: 700px;
+}
+
+#edan_dropped_image ul {
+  min-height: 118px;
+}
+
+#edan_dropped_items ol li,
+#edan_dropped_images ul li {
+  cursor: move;
+  line-height: 1.4;
+}
+
+#edan_dropped_images ul li,
+#edan_dropped_image ul li {
+  margin-top: 1rem;
+}
+
+.edan-image-caption-container {
+  width: 100%;
+  overflow: auto;
+}
+
+.image-wrapper {
+  float: left;
+  margin-right: 0.5rem;
+}
+
+.edan-image-caption {
+  float: left;
+  margin-right: 0.5rem;
+  margin-bottom: 1.0rem;
+}
+
+.edan-dropped-image-hidden-textarea,
+.edan-dropped-images-hidden-textarea {
+  display: none;
+}
+
+#edan_dropped_image .ui-state-disabled, .ui-widget-content .ui-state-disabled,
+#edan_dropped_images .ui-state-disabled, .ui-widget-content .ui-state-disabled {
+  opacity: 1.0;
+  filter: Alpha(Opacity=100);
+}
+
+.ui-state-default,
+.ui-state-hover {
+  border: none;
+  background-color: #EAEAEA;
+  background-image: none;
+  padding: 0;
+}
+
+.edan-image-caption {
+  width: 60%;
+}
+
+.activate-editor {
+  position: absolute;
+  margin-top: 12px;
+  right: 2.9em;
+  z-index: 10;
+}
+
+.header-note {
+  font-size: 0.8rem;
+  color: #777777;
+}
+
+/**
+ * Preloaders
+ */
+
+.app_preloader {
+  display: none;
+  margin-top: 3.5rem;
+  padding: 0 0 0 0.6rem;
+  font-weight: bold;
+  clear: both;
+}
+
+#edan_record_preloader {
+  display: none;
+  padding: 0 0 0 1.6rem;
+  font-weight: bold;
+  float: left;
+}
+
+.app_preloader img,
+#edan_record_preloader img {
+  margin: 4px 0 0 17px;
+}
+
+/**
+ * Record Preview Modal
+ */
+
+#preview_record_modal h2 {
+  font-size: 1.4rem;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: bold;
+}
+
+#preview_record_modal ol {
+  list-style-type: none;
+  margin: 0.25em 0;
+}
+
+.secondaryImageContainer p {
+  margin: 0;
+}
+
+#recordTitleContainer {
+  float: left;
+  width: 35%;
+  padding-right: 1rem;
+  border-right: 2px solid #A7A7A7;
+  height: 80px;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1.25em;
+}
+
+#mainBodyContainer {
+  float: left;
+  width: 50%;
+  margin-right: 0;
+  font-size: 0.75rem;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1.25em;
+  margin-left: 2rem;
+}
+
+#mainBodyContainer p {
+  margin: 0 0 1em 0;
+}
+
+#extendedBodyContainer {
+  margin: 1rem 0.75rem 1.5rem 0;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  padding-top: 1rem;
+}
+
+#extendedBodyContainer ol li {
+  margin-bottom: 0.75rem;
+}
+
+#secondaryImagesContainer {
+  overflow-x: auto;
+  clear: both;
+  margin-bottom: 1rem;
+  padding-top: 1rem;
+  height: auto;
+}
+
+.secondaryImageContainer {
+  padding: 0 2rem 0 0;
+  display: table-cell;
+}
+
+.secondaryImageContainer p.image-title {
+  margin: 0;
+  font-weight: bold;
+}
+
+.secondaryImageContainer p.image-sub-title {
+  margin: 0;
+  color: #555555;
+}
+
+.secondaryImageContainer .chosen-image {
+  cursor: pointer;
+}
+
+.gallery-record {
+  margin-left: 2em;
+}
+
+.gallery-record-container {
+  min-height: 330px;
+}
+
+.gallery-record-column.column-left {
+  float: left;
+  width: 48%;
+  margin: 0 1.75em 1.75em 0;
+}
+
+.gallery-record-column.column-left h3 {
+  margin: 0;
+  padding: 0;
+  font-size: 1.5rem;
+  line-height: 1rem;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 200;
+}
+
+.gallery-record-column.column-left h4 {
+  margin: 0;
+  padding: 0;
+  font-size: 1.3rem;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: bold;
+}
+
+.gallery-record-column.column-left ul li {
+  padding: 0;
+  list-style-position: inside;
+  line-height: 0.6rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 200;
+}
+
+.gallery-record-column.column-right {
+  margin: 1em 0 0 0;
+}
+
+.gallery-record-column.column-right img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.edan-actions-container h4 {
+  margin-top: 0;
+}
+
+.edan-app-message-container {
+  margin: 9px 0 10px;
+}
+
+div.status.edan-app-message {
+  background-image: none;
+  padding-left: 20px;
+  margin: 9px 0;
+}
+
+div.status.edan-app-message.gray-background {
+  background-color: #f8f8f8;
+  border-color: #e0e0d8;
+  margin: 0;
+}
+
+div.status.edan-app-message.light-yellow-background {
+  background-color: #FFFAE4;
+  border-color: #e0e0d8;
+  margin: 0;
+}
+
+.panner {
+  display: block;
+  position: absolute;
+  top: 50%;
+  cursor: pointer;
+}
+
+.panner a.button {
+  background: none;
+  background-color: #464646;
+  border-radius: 3px;
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+  filter: alpha(opacity=70);
+  opacity: 0.7;
+  padding: 1.25rem 1.0rem;
+  color: #fff;
+  margin-right: 0;
+  margin-bottom: 0;
+}
+
+#panLeft {
+  left: 16px;
+}
+
+#panRight {
+  right: 16px;
+}
+
+.active {
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: alpha(opacity=100);
+  opacity: 1.0;
+}
+
+#preview_gallery,
+#submit_gallery {
+  display: inline;
+}
+
+.gallery-navigation {
+  margin-top: 1rem;
+}
+
+.gallery-navigation ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.gallery-navigation ul li {
+  display: inline-block;
+  padding: 0 0.3rem;
+  width: 6rem;
+  text-align: center;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.8rem;
+  line-height: 1.1rem;
+  cursor: pointer;
+}
+
+.record-body {
+  margin-top: 2.2rem;
+}
+
+.gallery-record-column.column-left .record-body h4 {
+  margin: 0;
+  padding: 0;
+  font-size: 0.8rem;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: bold;
+}
+
+.bold-font {
+  font-weight: bold;
+}
+
+/**
+ * Gallery Components Page
+ */
+
+.subheader-container {
+  float: left; 
+  margin-bottom: 1.2rem;
+  padding: 0.5rem;
+  border: 1px solid #BCAAA4;
+  background-color: #F3F1F0;
+  width: 98%;
+}
+
+.subheader-container h2 {
+  margin-top: 0;
+}
+
+.subheader-container p {
+  margin-bottom: 0.4rem;
+}
+
+.subheader-image-container {
+  float: left; 
+  margin-right: 6px;
+}
+
+#component-liks {
+  float: left;
+}
+
+.component-nav-links {
+  display: inline-block;
+  float: left;
+  padding: 1rem 1.2rem 1rem 0;
+}
+
+.component-nav-links a {
+  font-size: 1rem;
+}
+
+#edan_record_view {
+  display: none;
+  border: 2px dotted #BBB;
+  margin: 0px 0px 2rem;
+  padding: 1rem;
+}
+
+#edan_record_view ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+#view_edan_record_container {
+  margin: 1rem 0 2rem 0;
+}
+
+#hide_edan_record_trigger {
+  vertical-align: text-top;
+  display: none;
+}
+
+/**
+ * Admin Settings Page
+ */
+
+#admin-settings-admin {
+  width: 50%;
+}
+
+.admin-settings-notes {
+  margin-bottom: 1rem;
+  padding: 8px;
+  border: 1px solid #dddddd;
+  border-radius: 4px;
+}
+
+.admin-settings-notes h4 {
+  margin-bottom: 1.5rem;
+}
+
+.admin-settings-notes h5 {
+  color: #666666;
+}
+
+.admin-settings-notes pre {
+  background: #f5f5f5;
+  border: 1px solid #dddddd;
+  border-radius: 3px;
+  overflow-x: auto;
+  margin: 0;
+  padding: 5px 10px;
+  word-wrap: normal;
+}
+
+.admin-settings-notes hr {
+  height: 0;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 0;
+  border-top: 1px solid #eeeeee;
+  box-sizing: content-box;
+}

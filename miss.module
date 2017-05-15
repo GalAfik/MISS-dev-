@@ -1,0 +1,1063 @@
+<?php
+/**
+ * @file
+ * The MISS module provides the ability to
+ * manage MISS kiosk content by searching EDAN 2.0 and associating
+ * data to kiosk-based objects.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function miss_menu() {
+  $items = array();
+
+  // MISS Admin Settings.
+  $items['admin/config/miss'] = array(
+    'title' => 'MISS',
+    'description' => 'MISS application settings.',
+    'position' => 'right',
+    'weight' => -15,
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+
+  $items['admin/config/miss/settings'] = array(
+    'title' => 'MISS Admin Settings',
+    'description' => 'Enter configurations, such as EDAN connection parameters.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('miss_admin'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['miss/manage/%'] = array(
+    'title' => 'Manage',
+    'title callback' => '_miss_manage_pagetitle_callback',
+    'page callback' => '_miss_manage_page_callback',
+    'page arguments' => array(2),
+    'access arguments' => array('access miss content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['miss/list'] = array(
+    'title' => 'Manage MISS Content',
+    'page callback' => '_miss_list_page_callback',
+    'page arguments' => array(),
+    'access arguments' => array('access miss content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['miss/backup/%'] = array(
+    'title' => 'MISS Data Backups',
+    'page callback' => '_miss_data_backups_page_build',
+    'file' => '_miss_data_backups.inc',
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_CALLBACK,
+  );
+
+  // File callback
+  // TODO: Move into EDAN once the dust settles
+  $items['miss/files/ajax'] = array(
+    'page callback' => '_miss_file_listing_callback',
+    'file' => '_file.inc',
+    'access arguments' => array('access miss content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['miss/files/upload_only'] = array(
+    'page callback' => '_miss_file_upload_only_callback',
+    'file' => '_file.inc',
+    'access arguments' => array('access miss content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['miss/files/base_form'] = array(
+    'page callback' => '_miss_file_upload_page_callback',
+    'file' => '_file.inc',
+    'access arguments' => array('access miss content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['miss/files/delete_file/ajax'] = array(
+    'page callback' => '_miss_delete_file',
+    'file' => '_file.inc',
+    'access arguments' => array('access miss content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['miss/files/image_rotate'] = array(
+    'page callback' => '_miss_file_image_rotate_callback',
+    'file' => '_file.inc',
+    'access arguments' => array('access miss content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  // Search EDAN (AJAX).
+  $items['search_edan/ajax'] = array(
+    'page callback' => '_miss_search_edan_ajax',
+    'page arguments' => array(),
+    'access arguments' => array('access miss content'),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  // Get Record (AJAX).
+  $items['get_record/ajax'] = array(
+    'page callback' => '_miss_get_record_ajax',
+    'page arguments' => array(0, 1),
+    'access arguments' => array('access miss content'),
+    'access callback' => TRUE, # TODO: Verify this?
+    'type' => MENU_CALLBACK,
+  );
+
+  // Format edanauth record route (AJAX).
+  $items['format_edanmdm_record/ajax'] = array(
+    'page callback' => '_miss_format_edanmdm_record',
+    'access arguments' => array('access miss content'),
+    'access callback' => TRUE, # TODO: Verify this?
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['miss/reflections-booth/ajax'] = array(
+    'page callback' => '_miss_rb_video_submissions_callback',
+    'file' => '_reflections_booth.inc',
+    'access arguments' => array('access miss content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Define roles and their wait.
+ * used as a helper method for miss_intall.
+ */
+function miss_default_roles() {
+  $roles = array();
+
+  $roles['miss viewer'] = array(
+    'name' => 'miss viewer',
+    'permissions' => array(
+      'access miss content',
+      'view visual arts content',
+      'view in the studio content',
+      'view reflections booth content',
+      'view hub content',
+      'view arc content',
+      'view record store content',
+      'view lunch counter content',
+      ),
+  );
+
+  $roles['miss visual arts viewer'] = array(
+    'name' => 'miss visual arts viewer',
+    'permissions' => array(
+      'access miss content',
+      'view visual arts content',
+      ),
+  );
+
+  $roles['miss in the studio viewer'] = array(
+    'name' => 'miss in the studio viewer',
+    'permissions' => array(
+      'access miss content',
+      'view in the studio content',
+      ),
+  );
+
+  $roles['miss reflections booth viewer'] = array(
+    'name' => 'miss reflections booth viewer',
+    'permissions' => array(
+      'access miss content',
+      'view reflections booth content',
+      ),
+  );
+
+  $roles['miss the hub viewer'] = array(
+    'name' => 'miss the hub viewer',
+    'permissions' => array(
+      'access miss content',
+      'view hub content',
+      ),
+  );
+
+  $roles['miss the arc viewer'] = array(
+    'name' => 'miss the arc viewer',
+    'permissions' => array(
+      'access miss content',
+      'view arc content',
+      ),
+  );
+
+  $roles['miss record store viewer'] = array(
+    'name' => 'miss record store viewer',
+    'permissions' => array(
+      'access miss content',
+      'view record store content',
+      ),
+  );
+
+  $roles['miss lunch counter viewer'] = array(
+    'name' => 'miss lunch counter viewer',
+    'permissions' => array(
+      'access miss content',
+      'view lunch counter content',
+      ),
+  );
+
+  $roles['miss editor'] = array(
+    'name' => 'miss editor',
+    'permissions' => array(
+      'access miss content',
+      'upload files',
+      'edit visual arts content',
+      'edit in the studio content',
+      'edit reflections booth content',
+      'edit hub content',
+      'edit arc content',
+      'edit record store content',
+      'edit lunch counter content',
+      ),
+  );
+
+  $roles['miss reflections booth moderator'] = array(
+    'name' => 'miss reflections booth moderator',
+    'permissions' => array(
+      'access miss content',
+      'upload files',
+      'moderate miss content',
+      'edit reflections booth content',
+      ),
+  );
+
+  $roles['miss reflections booth editor'] = array(
+    'name' => 'miss reflections booth editor',
+    'permissions' => array(
+      'access miss content',
+      'upload files',
+      'edit reflections booth content',
+      'view reflections booth content',
+      ),
+  );
+
+  $roles['miss reflections booth reviewer'] = array(
+    'name' => 'miss reflections booth reviewer',
+    'permissions' => array(
+      'access miss content',
+      'review reflections booth content',
+      'view reflections booth content',
+      ),
+  );
+
+  $roles['miss visual arts editor'] = array(
+    'name' => 'miss visual arts editor',
+    'permissions' => array(
+      'access miss content',
+      'upload files',
+      'edit visual arts content',
+      'view visual arts content',
+      ),
+  );
+
+  $roles['miss in the studio editor'] = array(
+    'name' => 'miss in the studio editor',
+    'permissions' => array(
+      'access miss content',
+      'upload files',
+      'edit in the studio content',
+      'view in the studio content',
+      ),
+  );
+
+  $roles['miss the hub editor'] = array(
+    'name' => 'miss the hub editor',
+    'permissions' => array(
+      'access miss content',
+      'upload files',
+      'edit hub content',
+      'view hub content',
+      ),
+  );
+
+  $roles['miss the arc editor'] = array(
+    'name' => 'miss the arc editor',
+    'permissions' => array(
+      'access miss content',
+      'upload files',
+      'edit arc content',
+      'view arc content',
+      ),
+  );
+
+  $roles['miss record store editor'] = array(
+    'name' => 'miss record store editor',
+    'permissions' => array(
+      'access miss content',
+      'upload files',
+      'edit record store content',
+      'view record store content',
+      ),
+  );
+
+  $roles['miss lunch counter editor'] = array(
+    'name' => 'miss lunch counter editor',
+    'permissions' => array(
+      'access miss content',
+      'upload files',
+      'edit lunch counter content',
+      'view lunch counter content',
+      ),
+  );
+
+  return $roles;
+}
+
+/**
+ * Implement hook_install().
+ */
+function miss_install() {
+  // Call the array with your default roles.
+  $roles = miss_default_roles();
+  // Loop through the array.
+  foreach ($roles as $value) {
+    // Check that a role is not already returned.
+    if (!user_role_load_by_name($value)) {
+      $role = new stdClass(); // create your Class
+
+      // Match values to the role Class.
+      $role->name = $value['name'];
+      $role->weight = $value['weight'];
+      $role->permissions = $value['permissions'];
+
+      // Save the Role using Drupal's API.
+      user_role_save($role);
+
+      //set permissions for each role
+      foreach ($permissions as $permission){
+        user_role_grant_permissions($role, array_keys(module_invoke('miss', $permission)));
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function miss_permission() {
+  return array(
+    'access miss content' => array(
+      'title' => t('Access the MISS module'),
+    ),
+    'moderate miss content' => array(
+      'title' => t('Moderate Reflections Booth content'),
+    ),
+    'review miss content' => array(
+      'title' => t('Review Reflections Booth content'),
+    ),
+    'edit visual arts content' => array(
+      'title' => t('Edit Visual Arts Tour content'),
+    ),
+    'view visual arts content' => array(
+      'title' => t('View Visual Arts Tour content'),
+    ),
+    'edit in the studio content' => array(
+      'title' => t('Edit In the Studio content'),
+    ),
+    'view in the studio content' => array(
+      'title' => t('View In the Studio content'),
+    ),
+    'edit reflections booth content' => array(
+      'title' => t('Edit Reflections Booth content'),
+    ),
+    'view reflections booth content' => array(
+      'title' => t('View Reflections Booth content'),
+    ),
+    'edit hub content' => array(
+      'title' => t('Edit Hub content'),
+    ),
+    'view hub content' => array(
+      'title' => t('View Hub content'),
+    ),
+    'edit arc content' => array(
+      'title' => t('Edit Arc content'),
+    ),
+    'view arc content' => array(
+      'title' => t('View Arc content'),
+    ),
+    'edit record store content' => array(
+      'title' => t('Edit Record Store content'),
+    ),
+    'view record store content' => array(
+      'title' => t('View Record Store content'),
+    ),
+    'edit lunch counter content' => array(
+      'title' => t('Edit Lunch Counter content'),
+    ),
+    'view lunch counter content' => array(
+      'title' => t('View Lunch Counter content'),
+    ),
+    'upload files' => array(
+      'title' => t('Upload files using the File UI'),
+    )
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function miss_theme() {
+
+  $themes = array();
+
+  $themes['miss_visual_arts_tour_browse'] = array(
+    'template' => '_visual_arts_tour',
+    'render element' => 'page',
+    'path' => drupal_get_path('module', 'miss')
+  );
+
+  $themes['miss_visual_arts_tour_manage'] = array(
+    'template' => '_visual_arts_tour_manage',
+    'render element' => 'page',
+    'path' => drupal_get_path('module', 'miss')
+  );
+
+  $themes['miss_visual_arts_tour_manage_components'] = array(
+    'template' => '_visual_arts_tour_manage_components',
+    'render element' => 'page',
+    'path' => drupal_get_path('module', 'miss')
+  );
+
+  $themes['visual_arts_tour_manage_components_image_metadata'] = array(
+    'template' => '_visual_arts_tour_manage_components_image_metadata',
+    'render element' => 'page',
+    'path' => drupal_get_path('module', 'miss')
+  );
+
+  return $themes;
+}
+
+/**
+ * Implements hook_page_alter().
+ */
+function miss_page_alter(&$page) {
+
+  $current_path = current_path();
+  $current_path_alias = drupal_get_path_alias($current_path);
+
+  if( stristr($current_path_alias, 'miss/manage') ) {
+    // Remove sidebar_first from the page layout.
+    unset($page['sidebar_first']);
+  }
+
+
+  global $user;
+  if( current_path() == 'node' && !$user->uid) {
+    $page['content']['system_main']['default_message']['#markup'] = _get_privacy_policy();
+  }
+}
+
+function _get_privacy_policy() {
+  $out = '<p><b>By signing into this system, you are agreeing that you have read and will abide by the Smithsonian Directive 931, Use of Computers, Telecommunications Devices and Networks.</b></p>';
+
+  $out .= '<hr style="height: 0; margin-top: 20px; margin-bottom: 20px; border: 0; border-top: 1px solid #bbbbbb; box-sizing: content-box;">';
+
+  $out .= '<h3><b>PRIVACY STATEMENT</b></h3>';
+
+  $out .= '<p>The Smithsonian\'s MISS CMS cannot be used to post sensitive information. Sensitive information is determined by each unit, but may include such information as combinations to locks, passwords, location of sensitive materials, etc. </p>';
+
+  $out .= '<p>In addition, this CMS may not be used to post sensitive personally identifiable information (SPII) without the prior approval of OCIO IT Security. SPII is defined as information, which if lost, compromised, or disclosed without authorization, could result in substantial harm, embarrassment, inconvenience, or unfairness to an individual. Examples of SPII include social security numbers, credit card numbers, financial account numbers, and biometric identifiers such as iris scans, retina scans, fingerprints, and voice prints. Certain data elements such as medical information, driver\'s license number, full date of birth, passport numbers, security information, such as mother\'s maiden name, last four digits of the social security number, in combination with an individual\'s identity, is also considered SPII. </p>';
+
+  $out .= '<p>If you have any questions about SPII or sensitive information, please contact the <a href="mailto:ociohelpdesk@si.edu">OCIO Help Desk</a> at x340000 (VoIP) or 202-633-4000 (non-VoIP). </p>';
+
+  $out .= '<p>End users and site owners of this CMS must comply with the <a href="https://www.si.edu/termsofuse">Terms of Use</a> as stated on the SI.edu.</p>';
+
+  $out .= '<p>Users acknowledge that all content within this CMS and is considered a record that must be managed as such in accordance with guidance and retentions provided by the Smithsonian Institution Archives (SIA). Units are wholly responsible for managing records in SharePoint, including creating, uploading, organizing, restricting, and deleting records as well as initiating the transfer of inactive records identified as having permanent value to SIA. SIA offers general guidance on its website (<a href="http://siarchives.si.edu/records/main.html">http://siarchives.si.edu/records/main.html</a>), provides unit-specific guidance upon request, assists in the transfer of records from SharePoint to SIA, and provides access to the records after they are transferred.</p>';
+
+  $out .= '<p>Records of permanent value must not be deleted until copies have been transferred to SIA or copies maintained elsewhere have been designated as the official record. </p>';
+
+  $out .= '<p>Records with a mandatory retention period must not be deleted before the retention period has been reached. These records must be deleted no later than a year after the mandatory retention period has been reached unless extenuating circumstances apply. Site administrators should contact SIA soon after the site is created to determine applicable retention periods for anticipated content. Site administrators must contact SIA prior to the deletion of the site to determine the proper disposition of the records.</p>';
+
+  return $out;
+}
+
+
+
+/**
+ * MISS content types.
+ */
+function _miss_types() {
+  return array(
+    'visualArtsTour' => 'Visual Arts Tour',
+    'inTheStudio' => 'In The Studio',
+    'reflectionsBooth' => 'Reflections Booth',
+    'theHub' => 'The Hub',
+    'recordStore' => 'Record Store',
+    'theArc' => 'The Arc',
+    'lunchCounter' => 'Lunch Counter',
+  );
+}
+
+function _miss_access_types() {
+  return array(
+    'visualArtsTour' => 'visual arts',
+    'inTheStudio' => 'in the studio',
+    'reflectionsBooth' => 'reflections booth',
+    'theHub' => 'hub',
+    'recordStore' => 'record store',
+    'theArc' => 'arc',
+    'lunchCounter' => 'lunch counter',
+  );
+}
+
+/**
+ * List interactives page callback.
+ */
+function _miss_list_page_callback() {
+  drupal_set_title('Interactive List');
+
+  # TODO: Make this a themed list/table
+  $miss_types = _miss_types();
+  $access_type = _miss_access_types();
+
+  $output = '<ul>';
+  foreach($miss_types as $type => $title) {
+    // Proceess camel case and add spaces to the MISS types.
+    $output .= user_access('view ' . $access_type[$type] . ' content') ? '<li>' . l($title, 'miss/manage/' . $type) . '</li>' : '<li style="color:gray;">' . $title . '</li>';
+  }
+  $output .= '</ul>';
+
+  return $output;
+}
+
+/**
+ * Process type titles.
+ */
+function _miss_manage_pagetitle_callback($interactive = FALSE) {
+  $types = _miss_types();
+
+  if (!isset($types[$interactive])) {
+    return '';
+  }
+
+  return $types[$interactive];
+}
+
+/**
+ * Manage interactives page callback.
+ */
+function _miss_manage_page_callback($interactive = '') {
+  $callback_file = '';
+  $output = l('Interactives Listing', 'miss/list');
+  $title = 'MISS Default Page';
+
+  $types = _miss_types();
+  $title = $types[$interactive];
+
+  // Build-out the breadcrumbs.
+  $crumbs = array();
+  $crumbs[] = l(t('Home'), '<front>');
+  $crumbs[] = l(t('Interactive List'), 'miss/list');
+  $crumbs[] = l(t($title), 'miss/manage/' . $interactive);
+  drupal_set_breadcrumb($crumbs);
+
+  // Ouput
+  drupal_set_title($title);
+
+  switch ($interactive) {
+    case 'visualArtsTour':
+      $callback_file = '_visual_arts_tour';
+    break;
+
+    case 'inTheStudio':
+      $callback_file = '_in_the_studio';
+    break;
+
+    case 'reflectionsBooth':
+      $callback_file = '_reflections_booth';
+    break;
+
+    case 'theHub':
+      $callback_file = '_the_hub';
+    break;
+
+    case 'recordStore':
+      $callback_file = '_record_store';
+    break;
+
+    case 'theArc':
+      $callback_file = '_the_arc';
+    break;
+
+    case 'lunchCounter':
+      $callback_file = '_lunch_counter';
+    break;
+  }
+
+  # TODO: Sanitation and file validation
+  if (file_exists(drupal_get_path('module', 'miss') . '/' . $callback_file . '.inc')) {
+    include($callback_file . '.inc');
+  } else {
+    return MENU_NOT_FOUND;
+  }
+
+  // Required file manangement JS
+  drupal_add_js(
+    drupal_get_path('module', 'miss') . '/js/_miss_file_manage.js',
+    array('scope' => 'footer', 'weight' => 3)
+  );
+  return $output;
+}
+
+/**
+ * The EDAN search form.
+ */
+function _miss_search_edan_form($type = 'images') {
+  $output = '<label for="edit-query-edan-images">Search EDAN </label>' . "\n";
+  $output .= '<input value="" placeholder="Enter search term(s)" class="query-edan form-text" type="text" id="edit-query-edan-images" name="query_edan_images" size="60" maxlength="255" />' . "\n";
+  $output .= '<a class="button search-edan-button" id="search_' . $type . '">Search</a>' . "\n";
+  return $output;
+}
+
+/**
+ * AJAX search EDAN 2.0 callback function.
+ */
+function _miss_search_edan_ajax() {
+
+  $data = array();
+
+  if(!empty($_POST['query'])) {
+
+    $imageSearch = (isset($_POST['search_type']) && ($_POST['search_type'] === 'search_images')) ? true : false;
+
+    // Search arguments.
+    $args = array(
+      'universal' => true
+      ,'start' => 0
+      ,'rows' => $imageSearch ? 50 : 50
+      ,'q' => $_POST['query'] ? urlencode($_POST['query']) : '*:*'
+      ,'fq' => $imageSearch ? array('type:edanmdm', 'online_visual_material:"true"') : array('type:edanmdm')
+      // online_visual_material:"true", 'online_media_type:"Images"'
+    );
+
+    // 1. Instantiate the EDANSearch class.
+    // 2. Execute the search and get the result.
+    $edan_search = edan_search();
+    $result = $edan_search->executeSearch($args);
+    $error = $edan_search->getInfo();
+
+    if($result['numFound'] !== 0) {
+      // Process images.
+      if($imageSearch) {
+        foreach($result['items'] as $data_key => $data_value) {
+          $data[] = app_util_get_edanmdm_images( $data_value );
+        }
+      } else {
+        $data = ($result['numFound'] !== 0) ? $result : array();
+      }
+    }
+
+  }
+
+  drupal_json_output($data);
+  exit;
+
+}
+
+/**
+ * AJAX Get Record callback function.
+ */
+function _miss_get_record_ajax() {
+
+  $data = array();
+
+  if(!empty($_POST['query']) || !empty($_POST['query_id'])) {
+
+    $query = !empty($_POST['query']) ? rawurlencode($_POST['query']) : rawurlencode($_POST['query_id']);
+    $uri = !empty($_POST['query']) ? 'url=' . $_POST['query'] : 'id=' . $_POST['query_id'];
+    $info = '';
+    // 1. Instantiate the EDANSearch class.
+    // 2. Execute the search and get the result.
+    $edan = edan();
+    $result = $edan->sendRequest(
+       $uri
+      ,variable_get('getContent')
+      ,FALSE
+      ,$info
+    );
+    $result_array = json_decode($result, TRUE);
+    $data = !empty($result_array['id']) ? $result_array : array();
+
+  }
+
+  drupal_json_output($data);
+  exit;
+
+}
+
+/**
+ * Send MISS Request
+ *
+ * @param string endpoint
+ *   The MISS endpoint. e.g. variable_get('visualartsSetGalleryDescription')
+ * @param string uri
+ *   Build $params and set the $uri as such: drupal_http_build_query($params);
+ * @param string $override_set_as_post_or_get
+ *   Override the usual POST / GET logic, NULL = usual logic,  POST = POST, GET = GET
+ * @return array
+ *   (1) Result from EDAN
+ *   (2) An 'error' key, with the value containing a message and EDAN's HTTP status code
+ *   (3) An empty array
+ */
+function _miss_send_miss_request($endpoint = false, $uri = false, $override_set_as_post_or_get = NULL) {
+
+  $data = array();
+
+  if($endpoint) {
+
+    // If the endpoint string contains 'render', set $post to FALSE, otherwise set to TRUE.
+    $post = (stristr($endpoint, 'render') || stristr($endpoint, 'getComponents')) ? FALSE : TRUE;
+    if ($override_set_as_post_or_get === 'POST') {
+      $post = TRUE;
+    }
+    if ($override_set_as_post_or_get === 'GET') {
+      $post = FALSE;
+    }
+
+    // 1. Instantiate the EDANInterface class.
+    $edan = edan();
+    // 2. Execute the search and get the result.
+    $info = 'CACHED'; //TODO: have class.edan_search.php deal with caching and returning $info properly
+    $result = $edan->sendRequest($uri, $endpoint, $post, $info);
+
+    if($info === 'CACHED' || $info['http_code'] === 200) {
+      $endpoint_parts = explode('/', $endpoint);
+      $endpoint_name = array_pop($endpoint_parts);
+      $data = json_decode($result, TRUE);
+      // Log to the database
+      if($post) {
+        $out = '<p><strong>' . $endpoint_name . '</strong></p>' . "\n";
+        $out .= '<hr style="border: 0; border-top: 1px solid #666666;">' . "\n";
+        $out .= '<p><strong>Endpoint</strong><br><br>' . $endpoint . '</p>' . "\n";
+        $out .= '<hr style="border: 0; border-top: 1px solid #666666;">' . "\n";
+        $out .= '<p><strong>URI</strong> (with urldecode + htmlspecialchars applied)<br><br>' . htmlspecialchars(urldecode($uri)) . '</p>' . "\n";
+        watchdog('miss_api_posts', $out);
+      }
+    } else {
+      $edan_error = json_decode($result, TRUE);
+      $edan_message = !empty($edan_error['error']) ? 'EDAN Message: ' . $edan_error['error'] . ' | ' : '';
+      $message = $edan_message . 'EDAN HTTP status code: ' . $info['http_code'];
+      $data = array('error' => $message);
+
+      // uncomment this when 500 error is resolved on the arc
+      drupal_set_message(t($message), 'error');
+
+      watchdog('miss_api_errors', $message);
+    }
+    if (
+      //TRUE ||
+      !empty($_GET['debug'])){
+      var_dump($info);
+      var_dump($uri);
+      if (!empty($uri)){
+      //  exit(); //BBB
+      }
+    }
+  }
+
+  return $data;
+}
+
+/**
+ * Page callback for formatting an edanmdm record (AJAX).
+ */
+function _miss_format_edanmdm_record() {
+
+  $data = '';
+  $final_metadata = array();
+
+  if(!empty($_POST)) {
+    $metadata_fields = array(
+      // 'content:descriptiveNonRepeating:title',
+      // 'title', // descriptiveNonRepeating
+      'objectType',
+      'physicalDescription',
+      'name',
+      'date',
+      'galleryLabel',
+      'notes',
+      'taxonomicName',
+      'language',
+      'publisher',
+      'place',
+      'setName',
+      'creditLine',
+      'objectRights',
+      'identifier',
+      'topic',
+      'culture',
+      'dataSource'
+    );
+    $processed_metadata = app_util_freetext_processor($_POST['record'], $metadata_fields);
+    // Convert to an array with the key as the label and content as the value.
+    foreach($processed_metadata as $metadata) {
+      foreach($metadata['values'] as $key => $value) {
+        foreach($value['values'] as $val) {
+          $final_metadata[$value['label']] = $val;
+        }
+      }
+    }
+    $post_divs = (!empty($_POST['divs']) && ($_POST['divs'] === 'false')) ? false : true;
+    $data = app_util_make_list_from_array($final_metadata, 'edanList', false, $post_divs);
+  }
+  drupal_json_output($data);
+  exit;
+}
+
+/**
+ * Creates backups for each interactive type.
+ */
+function _miss_data_backups_create_backups() {
+
+  $data = array();
+  $timestamp = date('Y-m-d_H-i-s');
+  $file_names_array = array(
+    'components' => $timestamp . '_miss_components_',
+    'render' => $timestamp . '_miss_render_',
+  );
+  $backup_files_path = variable_get('file_public_path', 'sites/default/files') . '/miss_backups/';
+  $edan_routes_array = _miss_data_backups_edan_routes();
+
+  // Backup "component" JSON files for each interactive.
+  foreach($edan_routes_array as $key => $value) {
+    $components = array();
+    $components = _miss_send_miss_request( 'miss/v1.0/nmaahc/' . $key . '/getComponents.htm' );
+    $fp = fopen($backup_files_path . $file_names_array['components'] . $key . '.json', 'w');
+    fwrite($fp, json_encode($components, JSON_PRETTY_PRINT));
+    fclose($fp);
+    // Set an error if the backup file could not be saved.
+    if(!file_exists($backup_files_path . $file_names_array['components'] . $key . '.json')) {
+      $data['errors'][$key] = 'Could not save the ' . $key . ' backup file.';
+    }
+  }
+
+  // Backup "render" JSON files for each interactive.
+  foreach($edan_routes_array as $key => $value) {
+    $render = array();
+    $render = _miss_send_miss_request( 'miss/v1.0/nmaahc/' . $key . '/render.htm' );
+    $fp = fopen($backup_files_path . $file_names_array['render'] . $key . '.json', 'w');
+    fwrite($fp, json_encode($render, JSON_PRETTY_PRINT));
+    fclose($fp);
+    // Set an error if the backup file could not be saved.
+    if(!file_exists($backup_files_path . $file_names_array['render'] . $key . '.json')) {
+      $data['errors'][$key] = 'Could not save the ' . $key . ' backup file.';
+    }
+  }
+
+  return $data;
+}
+
+/**
+ * Uses the job_scheduler module's API
+ * Implements hook_cron_job_scheduler_info()
+ */
+function miss_cron_job_scheduler_info() {
+  $schedulers = array();
+  $schedulers['miss_data_backup'] = array(
+    'worker callback' => '_miss_data_backups_create_backups',
+    'jobs' => array(
+       // 8:05 AM
+       array('type' => 'miss_backup_one', 'crontab' => '05 8 * * *', 'periodic' => TRUE),
+       // 2:05 PM
+       array('type' => 'miss_backup_two', 'crontab' => '05 14 * * *', 'periodic' => TRUE),
+       // 7:05 PM
+       array('type' => 'miss_backup_three', 'crontab' => '05 19 * * *', 'periodic' => TRUE),
+       // Tests
+       array('type' => 'miss_backup_four', 'crontab' => '17 19 * * *', 'periodic' => TRUE),
+    )
+  );
+  return $schedulers;
+}
+
+/**
+ * Module Configuration Settings.
+ * Allows for an admistrator to enter EDAN connection settings within Drupal.
+ */
+
+/**
+ * Implements hook_admin().
+ */
+function miss_admin() {
+  $allow_dump = variable_get('allow_dump');
+
+  $form = array();
+  // EDAN Endpoints (GET)
+  $form['edan_settings']['getContent'] = array(
+    '#type' => 'textfield',
+    '#title' => t('getContent'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('getContent'),
+    '#prefix' => '<h2>EDAN Endpoint: getContent</h2>',
+  );
+  // visualarts
+  $form['edan_settings']['visualartsRender'] = array(
+    '#type' => 'textfield',
+    '#title' => t('visualartsRender'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('visualartsRender'),
+    '#prefix' => '<hr>' . "\n" . '<h2>EDAN MISS Endpoints: Visual Arts</h2><a href="http://edandev.si.edu/applications/NMAAHC/#api-visualarts" target="_blank">EDAN Documentation</a>',
+  );
+  $form['edan_settings']['visualartsSetArtProfile'] = array(
+    '#type' => 'textfield',
+    '#title' => t('visualartsSetArtProfile'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('visualartsSetArtProfile'),
+  );
+  $form['edan_settings']['visualartsSetArtProfiles'] = array(
+    '#type' => 'textfield',
+    '#title' => t('visualartsSetArtProfiles'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('visualartsSetArtProfiles'),
+  );
+  $form['edan_settings']['visualartsSetAttractImageLoop'] = array(
+    '#type' => 'textfield',
+    '#title' => t('visualartsSetAttractImageLoop'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('visualartsSetAttractImageLoop'),
+  );
+  $form['edan_settings']['visualartsSetAttractLoopImages'] = array(
+    '#type' => 'textfield',
+    '#title' => t('visualartsSetAttractLoopImages'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('visualartsSetAttractLoopImages'),
+  );
+  $form['edan_settings']['visualartsSetGalleryDescription'] = array(
+    '#type' => 'textfield',
+    '#title' => t('visualartsSetGalleryDescription'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('visualartsSetGalleryDescription'),
+  );
+  $form['edan_settings']['visualartsSetGalleryDescriptions'] = array(
+    '#type' => 'textfield',
+    '#title' => t('visualartsSetGalleryDescriptions'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('visualartsSetGalleryDescriptions'),
+  );
+  // getComponents.htm
+  $form['edan_settings']['visualartsGetComponents'] = array(
+    '#type' => 'textfield',
+    '#title' => t('visualartsGetComponents'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('visualartsGetComponents'),
+  );
+  // inthestudio
+  $form['edan_settings']['inthestudioRender'] = array(
+    '#type' => 'textfield',
+    '#title' => t('inthestudioRender'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('inthestudioRender'),
+    '#prefix' => '<hr>' . "\n" . '<h2>EDAN MISS Endpoints: In the Studio</h2><a href="http://edandev.si.edu/applications/NMAAHC/#api-inthestudio" target="_blank">EDAN Documentation</a>',
+  );
+  $form['edan_settings']['inthestudioSetComponent'] = array(
+    '#type' => 'textfield',
+    '#title' => t('inthestudioSetComponent'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('inthestudioSetComponent'),
+  );
+  // reflections
+  $form['edan_settings']['reflectionsRender'] = array(
+    '#type' => 'textfield',
+    '#title' => t('reflectionsRender'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('reflectionsRender'),
+    '#prefix' => '<hr>' . "\n" . '<h2>EDAN MISS Endpoints: Reflections</h2><a href="http://edandev.si.edu/applications/NMAAHC/#api-reflections" target="_blank">EDAN Documentation</a>',
+  );
+  $form['edan_settings']['reflectionsSetAttractMediaLoop'] = array(
+    '#type' => 'textfield',
+    '#title' => t('reflectionsSetAttractMediaLoop'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('reflectionsSetAttractMediaLoop'),
+  );
+  $form['edan_settings']['reflectionsSetAttractVideo'] = array(
+    '#type' => 'textfield',
+    '#title' => t('reflectionsSetAttractVideo'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('reflectionsSetAttractVideo'),
+  );
+  $form['edan_settings']['reflectionsSetGalleryTag'] = array(
+    '#type' => 'textfield',
+    '#title' => t('reflectionsSetGalleryTag'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('reflectionsSetGalleryTag'),
+  );
+  $form['edan_settings']['reflectionsSetPromptQuestion'] = array(
+    '#type' => 'textfield',
+    '#title' => t('reflectionsSetPromptQuestion'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('reflectionsSetPromptQuestion'),
+  );
+  $form['edan_settings']['reflectionsSetUserReleaseForm'] = array(
+    '#type' => 'textfield',
+    '#title' => t('reflectionsSetUserReleaseForm'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('reflectionsSetUserReleaseForm'),
+  );
+  // IDS URL
+  $form['edan_settings']['ids_url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('URL'),
+    '#size' => 65,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#default_value' => variable_get('ids_url'),
+    '#prefix' => '<hr>' . "\n" . '<h2>IDS: Image Delivery Services</h2>',
+  );
+  // Allow dumps
+  $form['allow_dump'] = array(
+    '#type' => 'radios',
+    '#title' => t('Allow for data dumps to display on pages?'),
+    '#description' => t('To implement: <pre>if (isset($_GET[\'dump\']) && (variable_get(\'allow_dump\') === \'2\')) {' . "\n" .
+      '  // place var_export() or var_dump() here' . "\n" . '}</pre>'),
+    '#default_value' => !empty($allow_dump) ? $allow_dump : 1,
+    '#options' => array('1' => 'No', '2' => 'Yes'),
+    '#prefix' => '<hr>' . "\n" . '<h2>Activate/Deactivate Dumps</h2>',
+  );
+
+  return system_settings_form($form);
+}

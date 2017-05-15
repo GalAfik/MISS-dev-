@@ -1,0 +1,7 @@
+/**
+ * Force the page to be wider to accomodate DataTables with many columns
+ */
+
+body.page-miss-manage-reflectionsbooth-videos div#main {
+  width: 100%;
+}

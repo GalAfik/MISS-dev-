@@ -1,0 +1,93 @@
+To Do List
+==========
+
+Cortina Changes (4/1)
+---------------------
+In The Studio:
+  [X] Remove the "Pop-Up Title" field
+  [X] Change category headings to:
+        Melodies
+        Rhythms (currently beats)
+        Harmonies
+        Fills (currently sound effects)
+Record Store: (Genre list below)
+  [ ] Add Written Year single line field
+  [ ] Add Show single line field
+  [ ] Add Date Released single line field
+  [ ] Add Songwriter(s) single line field (comma separated)
+  [ ] Add Label single line field
+  [ ] Add Producer(s) single line field (comma separated)
+  [ ] Add Librettist single line field
+  [ ] Add Sampled Sounds single line field (comma separated)
+  [ ] Add Region single line field
+  [ ] Set Performer(s) as a rich text box
+  [ ] Set Genre a drop-down list, with one of the 23 genres selectable at a given time
+  [ ] Add Related Genre field
+  [ ] We have a new challenge with the "Related Genres" feature. Basically, we need to create a field holds up to three drop-down lists of the 23 genres. On the front end, visitors can touch a "Related Genre" and the interactive will relocate them to their selected genre's section. I'm not sure of the best solution for this on the back end, let's discuss it further as needed.
+      - The Record Store Genres are as follows:
+        Blues
+        Country
+        Folk
+        Rhythm & Blues
+        Soul
+        Jazz
+        Syncopated Instrumental
+        Ragtime
+        Classical
+        Opera
+        Rock
+        Hip-Hop
+        Rap
+        Funk
+        Disco
+        Go-Go
+        House-Techno
+        Musical Theater
+        Sacred
+        Gospel
+        Vocal
+        Global
+        Film/TV
+
+Reflections Studio:
+  [X] (GH) Implement drag/drop ordering functionality for questions
+
+The Hub
+  [-] (GH) Tags: Convert to a drop-down list of set tag words
+  [-] (GH) Add a 'Region' field, which similar to Tags is a drop-down, fixed list
+
+Done by March 23:
+[X] (MS) List page for interactives /miss/list
+[X] (GH) Manage page for Visual Arts Tour: /miss/manage/visual_arts_tour
+[X] (MS) Manage page for In the Studio: /miss/manage/in_the_studio
+
+Done by March 25:
+[X] (GH) Manage page for Reflections Booth: /miss/manage/reflections_booth
+[X] (JB) Manage page for Record Store: /miss/manage/
+
+Done by March 28:
+[X] (GH) Manage page for The Hub: /miss/manage/
+
+Post March 28:
+[-] (MS) File UI
+[ ] (  ) Removing images
+[ ] (  ) Removing components
+[ ] (  ) Record versioning (staging changes to the interactives without pushing)
+[-] (GH) Add record functionality for Visual Arts Tour
+[-] (GH) Add record functionality for Reflections Booth
+[-] (GH) Add record functionality for The Hub
+
+Mike's Notes:
+[X] Need to wire in InTheStudio_Component::save();
+[ ] Add page for browsing files
+[-] Test file upload
+[ ] JS file picker for Icon and AudioClipUrl
+[ ] How to reorder?
+[X] Disable via an admincontent call to change status to :1?
+[X] Disable errors need to be addressed: now it’s a data integrity thing
+
+Notes:
+- http://edandev.si.edu/applications/METADATA/
+- http://edandev.si.edu/applications/NMAAHC/
+- There's an endpoint(s) for pulling all components
+

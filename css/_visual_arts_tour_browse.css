@@ -1,0 +1,23 @@
+/**
+ * DataTables
+ */
+table tr th {
+  background-color: #DADADA;
+  color: inherit;
+  font-size: 0.9rem;
+}
+
+.dataTables_wrapper .dataTables_processing {
+  color: #8c2e0b;
+}
+
+.dataTables_wrapper .dataTables_processing {
+  top: 0%;
+  right: 44%;
+  background: inherit;
+  background-color: rgba(254, 245, 241, 0.5);
+  border: 1px solid #8c2e0b;
+  border-radius: 2px;
+  margin-top: 0;
+  padding-top: 14px;
+}

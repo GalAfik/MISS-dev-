@@ -1,0 +1,12 @@
+name = MISS
+description = Provides the ability to manage kiosk content.
+package = MISS
+core = 7.x
+version = "7.x-1.0"
+project = "MISS"
+configure = admin/config/miss/settings
+dependencies[] = edan
+dependencies[] = edan_search
+dependencies[] = edan_record
+dependencies[] = app_util
+dependencies[] = jquery_update
