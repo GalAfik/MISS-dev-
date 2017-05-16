@@ -911,16 +911,16 @@ function miss_video_submissions_form_submit($form, &$form_state) {
 
   // Backwards, because EDAN's status flags are backwards.
   // Featured status: 0 = published, 1 = not published
-  $featured = (isset($form_state['input']['featured']) && $form_state['input']['featured']) ? true : false;
-  $deletionRecommendation = (isset($form_state['input']['deletionRecommendation']) && $form_state['input']['deletionRecommendation']) ? true : false;
+  $featured = (isset($form_state['values']['featured']) && $form_state['values']['featured']) ? true : false;
+  $deletionRecommendation = (isset($form_state['values']['deletionRecommendation']) && $form_state['values']['deletionRecommendation']) ? true : false;
 
   include('_file.inc');
   $token = _miss_get_token(FALSE);
 
   // Write the poster image to disk, and upload to EDAN.
-  if(!empty($form_state['input']['videoPosterImageCatcher'])) {
+  if(!empty($form_state['values']['videoPosterImageCatcher'])) {
     // Process the base64 encoded string to a file.
-    $file_result_poster = _miss_process_base64_file( $form_state['input']['videoFileUrl'], $form_state['input']['videoPosterImageCatcher'], 'poster' );
+    $file_result_poster = _miss_process_base64_file( $form_state['values']['videoFileUrl'], $form_state['values']['videoPosterImageCatcher'], 'poster' );
     // Upload the file to EDAN.
     if(isset($file_result_poster['file_name'])) {
       $video_poster_image_url = _miss_upload_file_to_edan( $file_result_poster['file_name'], $token );
@@ -930,9 +930,9 @@ function miss_video_submissions_form_submit($form, &$form_state) {
   }
 
   // Write the video thumbnail image to disk, and upload to EDAN.
-  if(!empty($form_state['input']['videoThumbnailImageCatcher'])) {
+  if(!empty($form_state['values']['videoThumbnailImageCatcher'])) {
     // Process the base64 encoded string to a file.
-    $file_result_thumb = _miss_process_base64_file( $form_state['input']['videoFileUrl'], $form_state['input']['videoThumbnailImageCatcher'], 'thumb' );
+    $file_result_thumb = _miss_process_base64_file( $form_state['values']['videoFileUrl'], $form_state['values']['videoThumbnailImageCatcher'], 'thumb' );
     // Upload the file to EDAN.
     if(isset($file_result_thumb['file_name'])) {
       $video_thumbnail_image_url = _miss_upload_file_to_edan( $file_result_thumb['file_name'], $token );
@@ -953,29 +953,29 @@ function miss_video_submissions_form_submit($form, &$form_state) {
   
   global $user;
   $params = array(
-    'comments' => $form_state['input']['comments']['value'],
-    'age' => $form_state['input']['age'],
-    'gender' => $form_state['input']['gender'],
-    'race' => $form_state['input']['race'],
+    'comments' => $form_state['values']['comments']['value'],
+    'age' => $form_state['values']['age'],
+    'gender' => $form_state['values']['gender'],
+    'race' => $form_state['values']['race'],
     'location' => $form_state['input']['city'],
-    'region' => $form_state['input']['region'],
+    'region' => $form_state['values']['region'],
     // reviewer is always set to the current user
     'reviewer' => $user->name,
-    'galleryTagId' => $form_state['input']['galleryTagId'],
-    'promptQuestionId' => $form_state['input']['promptQuestionId'],
-    'videoFileUrl' => $form_state['input']['videoFileUrl'],
+    'galleryTagId' => $form_state['values']['galleryTagId'],
+    'promptQuestionId' => $form_state['values']['promptQuestionId'],
+    'videoFileUrl' => $form_state['values']['videoFileUrl'],
     'videoPosterImageUrl' => isset($video_poster_image_url['url']) 
     ? $video_poster_image_url['url'] 
-    : $form_state['input']['videoPosterImageUrl'],
+    : $form_state['values']['videoPosterImageUrl'],
     'videoThumbnailImageUrl' => isset($video_thumbnail_image_url['url']) 
     ? $video_thumbnail_image_url['url'] 
-    : $form_state['input']['videoThumbnailImageUrl'],
+    : $form_state['values']['videoThumbnailImageUrl'],
     'featured' => $featured,
     'deletionRecommendation' => $deletionRecommendation ? 1 : 0,
-    'email' => $form_state['input']['emailAddress'],
-    'userConsent' => $form_state['input']['userConsent'] ? true : false,
-    'markerStartTime' => $form_state['input']['markerStartTime'],
-    'markerEndTime' => $form_state['input']['markerEndTime'],
+    'email' => $form_state['values']['emailAddress'],
+    'userConsent' => $form_state['values']['userConsent'] ? true : false,
+    'markerStartTime' => $form_state['values']['markerStartTime'],
+    'markerEndTime' => $form_state['values']['markerEndTime'],
     );
 
 
