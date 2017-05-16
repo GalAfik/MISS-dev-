@@ -270,21 +270,24 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
 
     $markup = _miss_video_submissions_form_markup( $record );
     $poster_image_markup = _miss_video_submissions_form_poster_image_markup( $record );
-    $set_start_time_markup =(user_access('edit reflections booth content') || user_access('moderate miss content')) ? '<button class="markerStartTime" data-current-time="">Transfer Current Time</button>' : '' . "\n";
-    $set_end_time_markup =(user_access('edit reflections booth content') || user_access('moderate miss content')) ? '<button class="markerEndTime" data-current-time="">Transfer Current Time</button>' : ''  . "\n";
-    $set_poster_image_markup =(user_access('edit reflections booth content') || user_access('moderate miss content')) ? '<h4 style="font-weight: bold;">Set the Poster and Thumbnail Images</h4>' : '<h4 style="font-weight: bold;">Poster and Thumbnail Image</h4>' . "\n";
-    $set_poster_image_markup .=(user_access('edit reflections booth content') || user_access('moderate miss content')) ? '<p>To set the poster image and thumbnail, navigate to a frame and click the "Set Poster Image" button. Please allow several minutes for thumbnail submisstions to be uploaded and set.</p>' : '' . "\n";
-    $set_poster_image_markup .=(user_access('edit reflections booth content') || user_access('moderate miss content')) ? '<a href="javascript:void(0);" class="button setPosterImage">Set Poster Image</a>' : ''. "\n";
+    $set_start_time_markup =(user_access('edit reflections booth content')) ? '<button class="markerStartTime" data-current-time="">Transfer Current Time</button>' : '' . "\n";
+    $set_end_time_markup =(user_access('edit reflections booth content')) ? '<button class="markerEndTime" data-current-time="">Transfer Current Time</button>' : ''  . "\n";
+    $set_poster_image_markup =(user_access('edit reflections booth content')) ? '<h4 style="font-weight: bold;">Set the Poster and Thumbnail Images</h4>' : '<h4 style="font-weight: bold;">Poster and Thumbnail Image</h4>' . "\n";
+    $set_poster_image_markup .=(user_access('edit reflections booth content')) ? '<p>To set the poster image and thumbnail, navigate to a frame and click the "Set Poster Image" button. Please allow several minutes for thumbnail submisstions to be uploaded and set.</p>' : '' . "\n";
+    $set_poster_image_markup .=(user_access('edit reflections booth content')) ? '<a href="javascript:void(0);" class="button setPosterImage">Set Poster Image</a>' : ''. "\n";
     $clearfix_markup = '<div class="clearfix" style="margin-bottom: 1rem;"></div>' . "\n";
 
     $description = '';
     switch ($record['status']) {
       case 0:
-      $description = 'APPROVED. You can unapprove it by' . ( (isset($record['featured']) && $record['featured'] == true) ? ' unchecking the "Featured" box and then ' : ' ') . 'clicking "Pending Review" or delete it permanantly by clicking "Delete".';
+      $description = 'This record is currently APPROVED. You can unapprove it by' . ( (isset($record['featured']) && $record['featured'] == true) ? ' unchecking the "Featured" box and then ' : ' ') . 'clicking "Pending Review" or delete it permanantly by clicking "Delete".';
       break;
       default:
-      $description = 'PENDING REVIEW. You can approve it by clicking "Approve" or delete it permanantly by clicking "Delete".';
+      $description = 'This record is currently PENDING REVIEW. You can approve it by clicking "Approve" or delete it permanantly by clicking "Delete".';
       break;
+    }
+    if(user_access('review miss content')){
+      $description = 'Records may only be moderated by Moderators and Admins. In order to Approve, Reject, or Delete this video, please contact a Moderator or Administrator.';
     }
 
     //hide upload/insert buttons for non editors
@@ -296,9 +299,9 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
     drupal_add_js($button_script, 'inline');
 
     $form['moderationField'] = array(
-      '#type' => user_access('moderate miss content') ? 'fieldset' : 'hidden',
+      '#type' => user_access('moderate miss content') || user_access('review miss content') ? 'fieldset' : 'hidden',
       '#title' => t('Moderation Tools'),
-      '#description' => 'This record is currently ' . $description,
+      '#description' => $description,
       );
 
     $form['moderationField']['approve'] = array(
@@ -307,6 +310,7 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
       '#value' => t('Approve'),
       '#submit' => array('_miss_reflections_booth_form_approve'),
       '#attributes' => array('style' => 'font-size: 0.8rem; padding: 6px 8px; border-radius: 4px; margin-bottom: 0rem;'),
+      '#disabled' => !user_access('moderate miss content') ? TRUE : FALSE,
       );
 
     if($record['status'] != 1) $form['moderationField']['approve']['#type'] = 'hidden';
@@ -317,6 +321,7 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
       '#value' => t('Pending Review'),
       '#submit' => array('_miss_reflections_booth_form_reject'),
       '#attributes' => array('style' => 'font-size: 0.8rem; padding: 6px 8px; border-radius: 4px; margin-bottom: 0rem;'),
+      '#disabled' => !user_access('moderate miss content') ? TRUE : FALSE,
       );
 
     if($record['status'] != 0) $form['moderationField']['reject']['#type'] = 'hidden';
@@ -330,6 +335,7 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
         'style' => 'font-size: 0.8rem; padding: 6px 8px; border-radius: 4px; margin-bottom: 0rem; color: red;',
         'onclick' => 'if(!confirm("Are you sure you want to Delete this record? This action cannot be undone.")){return false;}',     
         ),
+      '#disabled' => !user_access('moderate miss content') ? TRUE : FALSE,
       );
 
     $form['moderationField']['deletionRecommendation'] = array(
@@ -345,7 +351,7 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
 
     $form['moderationField']['moderationHelptext'] = array(
       '#type' => 'fieldset',
-      '#title' => '&#10068 Deletion Recommendation Guidelines',
+      '#title' => '&#x2753 Deletion Recommendation Guidelines',
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
       );
@@ -450,7 +456,7 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
 
     $form['reviewerSection']['commentsHelptext'] = array(
       '#type' => 'fieldset',
-      '#title' => '&#10068 Reviewer Comments Guidelines',
+      '#title' => '&#x2753 Reviewer Comments Guidelines',
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
       );
@@ -677,7 +683,7 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
     $form['submit'] = array(
       '#type' => 'submit',
       '#value' => 'Save',
-      '#disabled' => (!user_access('edit reflections booth content')) ? TRUE : FALSE,
+      '#disabled' => (!user_access('edit reflections booth content') && !user_access('review miss content')) ? TRUE : FALSE,
       );
 
     //if the status is set to pending approval, hide everything other than the moderation tools and video links
