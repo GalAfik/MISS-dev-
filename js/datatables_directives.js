@@ -120,6 +120,10 @@ jQuery(document).ready(function($) {
       'targets' : [ 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11 ],
       // Apply classes.
       // {'targets': [ 0, 2 ], className: 'centered-table-cell'}
+      'targets' : 3,
+      'createdCell':  function (td, cellData, rowData, row, col) {
+        $(td).attr('data-order', rowData.lastTimeUpdated).attr('style', 'width: 12%');
+      }
     } ],
     // All data management will be done on the server side.
     "serverSide": true,
