@@ -280,11 +280,14 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
     $description = '';
     switch ($record['status']) {
       case 0:
-      $description = 'This record is currently APPROVED. You can unapprove it by' . ( (isset($record['featured']) && $record['featured'] == true) ? ' unchecking the "Featured" box and then ' : ' ') . 'clicking "Pending Review" or delete it permanantly by clicking "Delete".';
+      $description = 'This record is currently <span style="color:green;">APPROVED</span>. You can unapprove it by' . ( (isset($record['featured']) && $record['featured'] == true) ? ' unchecking the "Featured" box and then ' : ' ') . 'clicking "Pending Review" or delete it permanantly by clicking "Delete".';
       break;
       default:
-      $description = 'This record is currently PENDING REVIEW. You can approve it by clicking "Approve" or delete it permanantly by clicking "Delete".';
+      $description = 'This record is currently <span style="color:yellow;">PENDING REVIEW</span>. You can approve it by clicking "Approve" or delete it permanantly by clicking "Delete".';
       break;
+    }
+    if(isset($record['deletionRecommendation']) && $record['deletionRecommendation']){
+      $description .= ' This record has also been recommended for <span style="color:red;">DELETION</span> by a reviewer. Deleted videos are deleted permanantly and cannot be recovered.';
     }
     if(user_access('review miss content')){
       $description = 'Records may only be moderated by Moderators and Admins. In order to Approve, Reject, or Delete this video, please contact a Moderator or Administrator.';
