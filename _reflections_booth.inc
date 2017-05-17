@@ -699,8 +699,21 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
       $form['moderationField']['reject']['#type'] = 'hidden';
     }
   }else{
-    drupal_set_title('');
+    // global $user;
+    drupal_set_title('Private Video');
     drupal_set_message('The owner of this video has not granted consent for the viewing, moderation, or distribution of this content. Please contact an administrator for further guidance.', 'error');
+    // $form['deleteNonConsentVideo'] = array(
+    //   '#type' => 'submit',
+    //   '#value' => 'Delete This Record',
+    //   '#name' => 'delete_non_consent_record',
+    //   '#submit' => array('_miss_reflections_booth_form_delete'),
+    //   '#attributes' => array(
+    //     'style' => 'font-size: 0.8rem; padding: 6px 8px; border-radius: 4px; margin-bottom: 0rem; color: red;',
+    //     'onclick' => 'if(!confirm("Are you sure you want to Delete this record? This action cannot be undone.")){return false;}',     
+    //     ),
+    //   '#disabled' => (!in_array('administrator', array_values($user->roles)) ? TRUE : FALSE),
+    //   '#prefix' => '<p>Clicking this button will permanantly delete this record. This video will not be recoverable and will be gone forever. This action may only be taken by Administrators.</p>',
+    //   );
   }
 
 
