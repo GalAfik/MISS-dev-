@@ -9,7 +9,7 @@ jQuery(document).ready(function($) {
       if (/^DataTables_browse_/.test(key)) {
         var data = JSON.parse(localStorage[key]);
         // console.log(data.time);
-        if(data.time < 1492618789309) {
+        if(data.time < 1495027230895) {
           localStorage.removeItem(key);
         }
       }
@@ -113,17 +113,15 @@ jQuery(document).ready(function($) {
     { "data": "content_processed.recordId" },
     ],
     "columnDefs" : [ {
+      'width': '12%',
+      'targets': 3,
       // Enable sorting on all columns.
       'sortable' : true,
-      // Disable sorting on the columns 1, 2, and 4.
+      // Disable sorting on the columns 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11.
       'sortable' : false,
-      'targets' : [ 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11 ],
+      'targets' : [ 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11 ]
       // Apply classes.
       // {'targets': [ 0, 2 ], className: 'centered-table-cell'}
-      'targets' : 3,
-      'createdCell':  function (td, cellData, rowData, row, col) {
-        $(td).attr('data-order', rowData.lastTimeUpdated).attr('style', 'width: 12%');
-      }
     } ],
     // All data management will be done on the server side.
     "serverSide": true,
@@ -184,11 +182,13 @@ jQuery(document).ready(function($) {
     { "data": "content_processed.recordId" },
     ],
     "columnDefs" : [ {
+      'width': '12%',
+      'targets': 3,
       // Enable sorting on all columns.
       'sortable' : true,
-      // Disable sorting on the columns 1, 2, and 4.
+      // Disable sorting on the columns 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11.
       'sortable' : false,
-      'targets' : [ 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11 ],
+      'targets' : [ 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11 ]
       // Apply classes.
       // {'targets': [ 0, 2 ], className: 'centered-table-cell'}
     } ],

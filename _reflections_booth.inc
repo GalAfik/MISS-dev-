@@ -283,7 +283,7 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
       $description = 'This record is currently <span style="color:green;">APPROVED</span>. You can unapprove it by' . ( (isset($record['featured']) && $record['featured'] == true) ? ' unchecking the "Featured" box and then ' : ' ') . 'clicking "Pending Review" or delete it permanantly by clicking "Delete".';
       break;
       default:
-      $description = 'This record is currently <span style="color:yellow;">PENDING REVIEW</span>. You can approve it by clicking "Approve" or delete it permanantly by clicking "Delete".';
+      $description = 'This record is currently <span style="color:#FF9900;">PENDING REVIEW</span>. You can approve it by clicking "Approve" or delete it permanantly by clicking "Delete".';
       break;
     }
     if(isset($record['deletionRecommendation']) && $record['deletionRecommendation']){
@@ -302,7 +302,7 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
     drupal_add_js($button_script, 'inline');
 
     $form['moderationField'] = array(
-      '#type' => user_access('moderate miss content') || user_access('review miss content') ? 'fieldset' : 'hidden',
+      '#type' => 'fieldset',
       '#title' => t('Moderation Tools'),
       '#description' => $description,
       );
