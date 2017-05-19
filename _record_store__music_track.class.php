@@ -15,11 +15,25 @@ class MusicTrack extends RecordStoreComponent {
     }
 
     $relatedGenres = array(
+      '#title' => 'Related Genres',
+      '#collapsible' => FALSE,
       '#type' => 'fieldset',
       '#tree' => TRUE,
       '#description' => t('To remove a related genre, choose "- None -" from the drop-down list.'),
       '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
       );
+
+    $js = "jQuery(document).ready(function(){
+    jQuery('#edit-genres-relatedgenre-drupalform').find('.fieldset-legend').css('background-color', '#F0F0EE');
+    jQuery('#edit-genres-relatedgenre-drupalform').find('.fieldset-legend')
+    .css('background-image', 'none')
+    .css('background-repeat', 'no-repeat')
+    .css('background-position', 'left center')
+    .css('text-indent', '0px');
+    jQuery('#edit-genres-relatedgenre-drupalform').css('margin-bottom', '15px');
+    });";
+    drupal_add_js($js, 'inline');
+
     for ($rgi = 0; $rgi < 18; $rgi++) {
      $relatedGenreNext = array(
        '#type' => 'select',
@@ -123,127 +137,125 @@ class MusicTrack extends RecordStoreComponent {
         '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
         ),
       ),
-    'genre' => array(
-      'name' => 'Genre',
+    'genres' => array(
+      'name' => 'Genres',
       'drupalForm' => array(
-        '#type' => 'select',
-        '#options' => $genres,
-        '#empty_value' => '0',
-        '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
-        ),
-      ),
-    'relatedGenre' => array(
-      'name' => 'Related Genres',
-      'drupalForm' => $relatedGenres,
-      ),
-    'dateRelease' => array(
-      'name' => 'Date of Track Release',
-      'drupalForm' => array(
-        '#type' => 'textfield',
-        '#maxlength' => 524288,
-        '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
-        ),
-      ),
-    'writtenYear' => array(
-      'name' => 'Written Year',
-      'drupalForm' => array(
-        '#type' => 'textfield',
-        '#maxlength' => 524288,
-        '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
-        ),
-      ),
-    'performanceDate' => array(
-      'name' => 'Performance Date',
-      'drupalForm' => array(
-        '#type' => 'textfield',
-        '#maxlength' => 524288,
-        '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
-        ),
-      ),
-    'dateUsed' => array(
-      'name' => 'Date Used for Timeline',
-      'drupalForm' => array(
-        '#type' => 'select',
-        '#options' => array(
-          'Written Date' => 'Written Date',
-          'Released Date' => 'Released Date',
-          'Performance Date' => 'Performance Date'
+        '#type' => 'fieldset',
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+        '#tree' => TRUE,
+        'genre' => array(
+          '#title' => 'Genre',
+          '#type' => 'select',
+          '#options' => $genres,
+          '#empty_value' => '0',
+          '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
           ),
-        '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
+        'relatedGenre' => array(
+          'drupalForm' => $relatedGenres,
+          ),
         ),
       ),
-    'label' => array(
-      'name' => 'Music Label',
+    'musicDates' => array(
+      'name' => 'Music Track Dates',
       'drupalForm' => array(
-        '#type' => 'text_format',
-        '#format' => 'full_html',
-        '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
+        '#type' => 'fieldset',
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+        '#tree' => TRUE,
+        'dateRelease' => array(
+          '#title' => 'Date of Track Release',
+          '#type' => 'textfield',
+          '#maxlength' => 524288,
+          '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
+          ),
+        'writtenYear' => array(
+          '#title' => 'Written Year',
+          '#type' => 'textfield',
+          '#maxlength' => 524288,
+          '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
+          ),
+        'performanceDate' => array(
+          '#title' => 'Performance Date',
+          '#type' => 'textfield',
+          '#maxlength' => 524288,
+          '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
+          ),
+        'dateUsed' => array(
+          '#title' => 'Date Used for Timeline',
+          '#type' => 'select',
+          '#options' => array(
+            'Written Date' => 'Written Date',
+            'Released Date' => 'Released Date',
+            'Performance Date' => 'Performance Date'
+            ),
+          '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
+          ),
         ),
       ),
-    'songwriter' => array(
-      'name' => 'Songwriter',
+    'productionInformation' => array(
+      'name' => 'Production / Performance Information',
       'drupalForm' => array(
-        '#type' => 'textfield',
-        '#maxlength' => 524288,
-        '#description' => 'Field should be comma separated',
-        '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
-        ),
-      ),
-    'producer' => array(
-      'name' => 'Producer of Track',
-      'drupalForm' => array(
-        '#type' => 'textfield',
-        '#maxlength' => 524288,
-        '#description' => 'Field should be comma separated',
-        '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
-        ),
-      ),
-    'performer' => array(
-      'name' => 'Performer',
-      'drupalForm' => array(
-        '#type' => 'text_format',
-        '#format' => 'full_html',
-        '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
-        ),
-      ),
-    'composer' => array(
-      'name' => 'Composer',
-      'drupalForm' => array(
-        '#type' => 'textfield',
-        '#maxlength' => 524288,
-        '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
-        ),
-      ),
-    'librettist' => array(
-      'name' => 'Librettist',
-      'drupalForm' => array(
-        '#type' => 'textfield',
-        '#maxlength' => 524288,
-        '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
-        ),
-      ),
-    'samplesSounds' => array(
-      'name' => 'Music Samples Used in Track',
-      'drupalForm' => array(
-        '#type' => 'text_format',
-        '#format' => 'full_html',
-        '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
-        ),
-      ),
-    'show' => array(
-      'name' => 'Show',
-      'drupalForm' => array(
-        '#type' => 'text_format',
-        '#format' => 'full_html',
-        '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
-        ),
-      ),
-    'region' => array(
-      'name' => 'Region',
-      'drupalForm' => array(
-        '#type' => 'textfield',
-        '#maxlength' => 524288,
-        '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
+        '#type' => 'fieldset',
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+        '#tree' => TRUE,
+        'label' => array(
+          '#title' => 'Music Label',
+          '#type' => 'text_format',
+          '#format' => 'full_html',
+          '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
+          ),
+        'songwriter' => array(
+          '#title' => 'Songwriter',
+          '#type' => 'textfield',
+          '#maxlength' => 524288,
+          '#description' => 'Field should be comma separated',
+          '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
+          ),
+        'producer' => array(
+          '#title' => 'Producer of Track',
+          '#type' => 'textfield',
+          '#maxlength' => 524288,
+          '#description' => 'Field should be comma separated',
+          '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
+          ),
+        'performer' => array(
+          '#title' => 'Performer',
+          '#type' => 'text_format',
+          '#format' => 'full_html',
+          '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
+          ),
+        'composer' => array(
+          '#title' => 'Composer',
+          '#type' => 'textfield',
+          '#maxlength' => 524288,
+          '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
+          ),
+        'librettist' => array(
+          '#title' => 'Librettist',
+          '#type' => 'textfield',
+          '#maxlength' => 524288,
+          '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
+          ),
+        'samplesSounds' => array(
+          '#title' => 'Music Samples Used in Track',
+          '#type' => 'text_format',
+          '#format' => 'full_html',
+          '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
+          ),
+        'show' => array(
+          '#title' => 'Show',
+          '#type' => 'text_format',
+          '#format' => 'full_html',
+          '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
+          ),
+        'region' => array(
+          '#title' => 'Region',
+          '#type' => 'textfield',
+          '#maxlength' => 524288,
+          '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
+          ),
         ),
       ),
     'spotlight' => array(
@@ -489,7 +501,7 @@ return $fields;
       return TRUE;
 
     }
-    
+
   }
 
   /**

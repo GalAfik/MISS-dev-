@@ -27,7 +27,7 @@ function miss_prompt_questions_form( $form, &$form_state, $record = array() ) {
 }
 
   // disable gallery tag field if the status is 0 and the user is not an admin
-  global $user; 
+  global $user;
   $form['tag'] = array(
     '#type' => 'textfield',
     '#maxlength' => 524288,
@@ -171,7 +171,7 @@ function miss_prompt_questions_form_submit($form, &$form_state) {
 
   foreach ($form_state['input']['promptQuestions'] as $key => $value) {
     if(!empty($value['text'])) {
-      
+
       // The 'value' comparison should check to see if $key equals 0 , and are of the same type (!==), which should be zero, not boolean.
       // See: http://php.net/manual/en/language.operators.comparison.php
       // $id = (strpos($key, 'new') == false) ? '&id=' . $key : '';
@@ -225,12 +225,12 @@ function miss_reflections_booth_table_drag_elements($vars) {
   $form_element = $vars['page']['form']['promptQuestions'];
 
   drupal_add_tabledrag('reflections_booth_questions', 'order', 'sibling', 'item-row-weight');
-  
+
   $data['header'] = array(
-    'text' => t('Questions'), 
+    'text' => t('Questions'),
     'weight' => t('Weight'),
     );
-  
+
   $rows = array();
   foreach (element_children($form_element) as $key) {
 
@@ -336,7 +336,7 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
       '#submit' => array('_miss_reflections_booth_form_delete'),
       '#attributes' => array(
         'style' => 'font-size: 0.8rem; padding: 6px 8px; border-radius: 4px; margin-bottom: 0rem; color: red;',
-        'onclick' => 'if(!confirm("Are you sure you want to Delete this record? This action cannot be undone.")){return false;}',     
+        'onclick' => 'if(!confirm("Are you sure you want to Delete this record? This action cannot be undone.")){return false;}',
         ),
       '#disabled' => !user_access('moderate miss content') ? TRUE : FALSE,
       );
@@ -376,7 +376,8 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
     .css('background-image', 'none')
     .css('background-repeat', 'no-repeat')
     .css('background-position', 'left center')
-    .css('text-indent', '0px');
+    .css('text-indent', '0px')
+    .css('line-height', '1.95');
     jQuery('#edit-moderationhelptext').css('margin-bottom', '15px');
     });";
     drupal_add_js($js, 'inline');
@@ -484,7 +485,8 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
     .css('background-image', 'none')
     .css('background-repeat', 'no-repeat')
     .css('background-position', 'left center')
-    .css('text-indent', '0px');
+    .css('text-indent', '0px')
+    .css('line-height', '1.95');
     jQuery('#edit-commentshelptext').css('margin-bottom', '20px');
     });";
     drupal_add_js($js, 'inline');
@@ -527,11 +529,11 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
       );
 
     $form['reviewerSection']['race'] = array(
-      '#type' => 'textfield', 
+      '#type' => 'textfield',
       '#title' => t('Race / Ethnicity'),
-      '#default_value' => !empty($record['race']) ? $record['race'] : '', 
-      '#size' => 30, 
-      '#maxlength' => 30, 
+      '#default_value' => !empty($record['race']) ? $record['race'] : '',
+      '#size' => 30,
+      '#maxlength' => 30,
       '#disabled' => (user_access('edit reflections booth content') || user_access('review reflections booth content')) ? FALSE : TRUE,
       );
 
@@ -552,35 +554,35 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
       );
 
     $form['reviewerSection']['location']['city'] = array(
-      '#type' => 'textfield', 
+      '#type' => 'textfield',
       '#title' => t('Location'),
-      '#default_value' => !empty($record['location']) ? $record['location'] : '', 
-      '#size' => 30, 
-      '#maxlength' => 30, 
+      '#default_value' => !empty($record['location']) ? $record['location'] : '',
+      '#size' => 30,
+      '#maxlength' => 30,
       '#disabled' => (user_access('edit reflections booth content') || user_access('review reflections booth content')) ? FALSE : TRUE,
       );
 
     $form['reviewerSection']['location']['region'] = array(
       '#type' => 'select',
       '#options' => _miss_reflections_booth_region_form_field_options(),
-      '#default_value' => !empty($record['region']) ? $record['region'] : '', 
+      '#default_value' => !empty($record['region']) ? $record['region'] : '',
       '#disabled' => (user_access('edit reflections booth content') || user_access('review reflections booth content')) ? FALSE : TRUE,
       );
 
     $form['reviewerSection']['reviewer'] = array(
-      '#type' => 'textfield', 
+      '#type' => 'textfield',
       '#title' => t('Reviewer'),
       '#default_value' => !empty($record['reviewer']) ? $record['reviewer'] : '',
-      '#disabled' => TRUE, 
-      '#size' => 30, 
+      '#disabled' => TRUE,
+      '#size' => 30,
       );
 
     $form['reviewerSection']['reviewDate'] = array(
-      '#type' => 'textfield', 
+      '#type' => 'textfield',
       '#title' => t('Review Date'),
-      '#default_value' => !empty($record['last_time_updated']) ? $record['last_time_updated'] : '', 
+      '#default_value' => !empty($record['last_time_updated']) ? $record['last_time_updated'] : '',
       '#disabled' => TRUE,
-      '#size' => 30, 
+      '#size' => 30,
       );
 
     $form['videoMetadata'] = array(
@@ -709,7 +711,7 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
     //   '#submit' => array('_miss_reflections_booth_form_delete'),
     //   '#attributes' => array(
     //     'style' => 'font-size: 0.8rem; padding: 6px 8px; border-radius: 4px; margin-bottom: 0rem; color: red;',
-    //     'onclick' => 'if(!confirm("Are you sure you want to Delete this record? This action cannot be undone.")){return false;}',     
+    //     'onclick' => 'if(!confirm("Are you sure you want to Delete this record? This action cannot be undone.")){return false;}',
     //     ),
     //   '#disabled' => (!in_array('administrator', array_values($user->roles)) ? TRUE : FALSE),
     //   '#prefix' => '<p>Clicking this button will permanantly delete this record. This video will not be recoverable and will be gone forever. This action may only be taken by Administrators.</p>',
@@ -797,7 +799,7 @@ function _miss_reflections_booth_tags_field_options() {
   //   foreach ($json['stories'] as $item){
   //     array_push($sanitized, str_replace($unwanted_tags, '', strip_tags($item['name'])));
   //   }
-  // }      
+  // }
   // return $sanitized;
   return array(
     'Activism' => 'Activism',
@@ -827,7 +829,7 @@ function _miss_reflections_booth_get_default_tags($record){
   $results = array();
   $json = _miss_send_miss_request( 'miss/v1.0/nmaahc/the_arc/render.htm' );
   foreach ($record as $value) {
-    for ($i=0; $i < count($json['stories']); $i++) { 
+    for ($i=0; $i < count($json['stories']); $i++) {
       if($json['stories'][$i]['id'] == $value){
         array_push($results, $i);
       }
@@ -963,7 +965,7 @@ function miss_video_submissions_form_submit($form, &$form_state) {
   // }
 
   $tags = isset($form_state['input']['tags']) ? $form_state['input']['tags'] : array();
-  
+
   global $user;
   $params = array(
     'comments' => $form_state['values']['comments']['value'],
@@ -977,11 +979,11 @@ function miss_video_submissions_form_submit($form, &$form_state) {
     'galleryTagId' => $form_state['values']['galleryTagId'],
     'promptQuestionId' => $form_state['values']['promptQuestionId'],
     'videoFileUrl' => $form_state['values']['videoFileUrl'],
-    'videoPosterImageUrl' => isset($video_poster_image_url['url']) 
-    ? $video_poster_image_url['url'] 
+    'videoPosterImageUrl' => isset($video_poster_image_url['url'])
+    ? $video_poster_image_url['url']
     : $form_state['values']['videoPosterImageUrl'],
-    'videoThumbnailImageUrl' => isset($video_thumbnail_image_url['url']) 
-    ? $video_thumbnail_image_url['url'] 
+    'videoThumbnailImageUrl' => isset($video_thumbnail_image_url['url'])
+    ? $video_thumbnail_image_url['url']
     : $form_state['values']['videoThumbnailImageUrl'],
     'featured' => $featured,
     'deletionRecommendation' => $deletionRecommendation ? 1 : 0,
@@ -1006,7 +1008,7 @@ function miss_video_submissions_form_submit($form, &$form_state) {
   if(isset($result['error_message'])) {
     drupal_set_message( $result['error_message'], 'error' );
   }
-  
+
   if(!empty($result)) {
     drupal_set_message( t('Video submission has been successfully modified.') );
   } else {
@@ -1024,7 +1026,7 @@ function _miss_process_base64_file($file_name_url = false, $base64_string = fals
   $data = array();
 
   if($file_name_url && $base64_string) {
-    
+
     // First, get the file name.
     $url_parsed = parse_url($file_name_url);
     $url_parts = explode('/', $url_parsed['path']);
@@ -1149,7 +1151,7 @@ function _miss_video_submissions_form_markup($record) {
   $markup .= '</p>' . "\n";
   $markup .= '</div>' . "\n";
   $markup .= '<video width="853" height="480" id="video_element" crossOrigin="anonymous"' . $poster_image . ' controls>' . "\n";
-  $markup .= '<source src="' . $record['videoFileUrl'] . '#t=' . 
+  $markup .= '<source src="' . $record['videoFileUrl'] . '#t=' .
   $markerStartTime . ',' . $markerEndTime . '" type="video/mp4">Your browser does not support the video tag.' . "\n";
   $markup .= '</video>' . "\n";
   $markup .= '</div>' . "\n";
@@ -1165,7 +1167,7 @@ function _miss_video_submissions_form_poster_image_markup( $record ) {
   $markup = '<canvas id="canvas" width="853" height="480" style="display:none;"></canvas>' . "\n";
   $markup .= '<canvas id="canvasThumb" width="853" height="480" style="display:none;"></canvas>' . "\n";
   $markup .= '<div id="screenShot" style="margin-top: 1rem;' . $display . '">' . "\n";
-  $markup .= (isset($record['videoPosterImageUrl']) && !empty($record['videoPosterImageUrl'])) 
+  $markup .= (isset($record['videoPosterImageUrl']) && !empty($record['videoPosterImageUrl']))
   ? '<img src="' . $record['videoPosterImageUrl'] . '">' . "\n" : '';
   $markup .= '</div>' . "\n";
   return $markup;
@@ -1229,7 +1231,7 @@ function miss_reflections_booth_user_release_form_submit($form, &$form_state) {
 
   $uri = 'formText=' . urlencode($form_state['input']['formTextPartOne']['value']);
   $set = _miss_send_miss_request( 'miss/v1.0/nmaahc/reflections_booth/setUserReleaseForm.htm', $uri );
-  
+
   if(!empty($set['id'])) {
     drupal_set_message( t( 'User release content has been successfully modified.') );
   }
@@ -1243,7 +1245,7 @@ function miss_reflections_booth_user_release_form_submit($form, &$form_state) {
 
 /**
  * Video Submissions callback returns JSON
- * 
+ *
  * @return string
  */
 function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId = '', $passed_component_type = 'attract_video', $passed_status = '', $dump = FALSE, $gallery_tags = array(), $prompt_questions = array()) {
@@ -1298,7 +1300,7 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
     default:
         $sort = 'lastTimeUpdated';
     }
-    
+
   }
 
   $sortDir = (isset($_GET['order']) && !empty($_GET['order'])) ? (string)$_GET['order'][0]['dir'] : 'asc';
@@ -1356,14 +1358,14 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
         $result[$i]['content_processed']['status'] = (isset($record_value['content']['featured']) && $record_value['content']['featured']) ? '<span style="color: #069E2D;font-weight:bold;">Featured</span>' : ($record_value['status'] == 0 ? 'Approved' : 'Pending');
 
         $result[$i]['content_processed']['status'] .= (isset($record_value['content']['deletionRecommendation']) && $record_value['content']['deletionRecommendation']) ? ' <span style="color: red;">(Deletion is Recommended)</span>' : '';
-        
+
           // Get timestamp for the table.
         $time = (isset($record_value['lastTimeUpdated']) && $record_value['lastTimeUpdated']) ? $record_value['lastTimeUpdated'] : 'N/A';
         $datetime = DateTime::createFromFormat( 'Y-m-d H:i:s.u', $time, new DateTimeZone('America/New_York'));
         $result[$i]['content_processed']['timestamp'] = $datetime->format('m/d/Y g:i A');
 
         // $result[$i]['content_processed']['timestamp'] = $time;
-        
+
         $result[$i]['content_processed']['thumb'] = (isset($record_value['content']['videoThumbnailImageUrl']) && !empty($record_value['content']['videoThumbnailImageUrl']))
         ? '<img src="' . $record_value['content']['videoThumbnailImageUrl'] . '" alt="Thumbnail image file">'
         : '';
@@ -1421,7 +1423,7 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
         if(isset($record_value['content']['featured']) && $record_value['content']['featured']) $featured[] = '';
 
         $i++;
-        
+
       }
 
       $data['data'] = $result;
@@ -1436,7 +1438,7 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
 
       break;
   }
-  
+
 }
 
 function _miss_reflections_booth_get_featured_records( $gallery_id = null) {
@@ -1538,7 +1540,7 @@ function _miss_reflections_booth_page_build($interactive = '') {
 
      // Javascript
     drupal_add_js(
-      '//cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min.js', 
+      '//cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min.js',
       array('scope' => 'footer', 'type' => 'external', 'weight' => 50)
       );
       // CSS
@@ -1589,7 +1591,7 @@ function _miss_reflections_booth_page_build($interactive = '') {
       array('group' => CSS_THEME, 'type' => 'file', 'weight' => 51)
       );
     drupal_add_js(
-      '//cdnjs.cloudflare.com/ajax/libs/datatables/1.10.11/js/jquery.dataTables.min.js', 
+      '//cdnjs.cloudflare.com/ajax/libs/datatables/1.10.11/js/jquery.dataTables.min.js',
       array('scope' => 'footer', 'type' => 'external', 'weight' => 50)
       );
     drupal_add_js(
@@ -1617,11 +1619,22 @@ function _miss_reflections_booth_page_build($interactive = '') {
 
     // Loop through all of the records to build the table rows.
     foreach($gallery_tags['data']['components'] as $key => $value) {
+
       // Query for the approved and unapproved record counts
-      $approved_records = _miss_rb_video_submissions_callback(FALSE, $value['id'], 'attract_video', 0);
-      $unapproved_records = _miss_rb_video_submissions_callback(FALSE, $value['id'], 'attract_video', 1);
-      $approved_record_count = ($approved_records['recordsFiltered'] - $unapproved_records['recordsFiltered']);
-      $unapproved_record_count = $unapproved_records['recordsFiltered'];
+      $video_count_results = _miss_send_miss_request('miss/v1.0/nmaahc/reflections_booth/getGalleries.htm');
+      $approved_record_count = 0;
+      $unapproved_record_count = 0;
+
+      foreach ($video_count_results['rows'] as $gallery) {
+        if ($gallery['id'] == $value['id']) {
+          $approved_record_count = $gallery['content']['counts'][0]['count'];
+          $unapproved_record_count = $gallery['content']['counts'][1]['count'];
+        }
+      }
+      // $approved_records = _miss_rb_video_submissions_callback(FALSE, $value['id'], 'attract_video', 0);
+      // $unapproved_records = _miss_rb_video_submissions_callback(FALSE, $value['id'], 'attract_video', 1);
+      // $approved_record_count = ($approved_records['recordsFiltered'] - $unapproved_records['recordsFiltered']);
+      // $unapproved_record_count = $unapproved_records['recordsFiltered'];
 
       $data['page'] .= '<tr>' . "\n";
       $data['page'] .= '<td><strong>' . $value['content']['galleryTag'] . '</strong></td>' . "\n";
@@ -1780,7 +1793,7 @@ function _miss_reflections_booth_page_build($interactive = '') {
         if(count($featured_items) >= 9) {
           drupal_set_message( t('The maximum number of 9 featured videos has been reached. No more videos may be set to featured at this time.' ), 'warning' );
         }
-        
+
           // EDAN Record Dump.
         if(isset($_GET['dump']) && (variable_get('allow_dump') === '2')) {
             // Get all of the components.
@@ -1821,7 +1834,7 @@ function _miss_reflections_booth_page_build($interactive = '') {
             array('group' => CSS_THEME, 'type' => 'file', 'weight' => 52)
             );
           drupal_add_js(
-            '//cdnjs.cloudflare.com/ajax/libs/datatables/1.10.11/js/jquery.dataTables.min.js', 
+            '//cdnjs.cloudflare.com/ajax/libs/datatables/1.10.11/js/jquery.dataTables.min.js',
             array('scope' => 'footer', 'type' => 'external', 'weight' => 50)
             );
           drupal_add_js(
@@ -1962,7 +1975,7 @@ function _miss_reflections_booth_page_build($interactive = '') {
     return MENU_NOT_FOUND;
 
   }
-  
+
 }
 
 }
