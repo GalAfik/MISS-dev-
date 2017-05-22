@@ -807,6 +807,7 @@ function _miss_reflections_booth_tags_field_options() {
     'Black Power' => 'Black Power',
     'Civil Rights' => 'Civil Rights',
     'Communities' => 'Communities',
+    'Culture/Traditions' => 'Culture/Traditions',
     'Education' => 'Education',
     'Families/Genealogy' => 'Families/Genealogy',
     'Gender' => 'Gender',
@@ -820,7 +821,6 @@ function _miss_reflections_booth_tags_field_options() {
     'Religion/Faith' => 'Religion/Faith',
     'Segregation' => 'Segregation',
     'Slavery' => 'Slavery',
-    'Culture/Traditions' => 'Culture/Traditions',
     'The Arts' => 'The Arts',
     );
 }

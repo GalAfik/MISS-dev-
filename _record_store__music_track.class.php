@@ -23,17 +23,6 @@ class MusicTrack extends RecordStoreComponent {
       '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
       );
 
-    $js = "jQuery(document).ready(function(){
-    jQuery('#edit-genres-relatedgenre-drupalform').find('.fieldset-legend').css('background-color', '#F0F0EE');
-    jQuery('#edit-genres-relatedgenre-drupalform').find('.fieldset-legend')
-    .css('background-image', 'none')
-    .css('background-repeat', 'no-repeat')
-    .css('background-position', 'left center')
-    .css('text-indent', '0px');
-    jQuery('#edit-genres-relatedgenre-drupalform').css('margin-bottom', '15px');
-    });";
-    drupal_add_js($js, 'inline');
-
     for ($rgi = 0; $rgi < 18; $rgi++) {
      $relatedGenreNext = array(
        '#type' => 'select',
@@ -61,16 +50,12 @@ class MusicTrack extends RecordStoreComponent {
 
   $fields = array(
     'id' => array(),
-    'published' => array(
-      'name' => 'Published',
-      'drupalForm' => array(
-        '#type' => 'fieldset',
-        'status' => array(
-          '#title' => 'Enabled',
+    'status' => array(
+        'name' => '<b>Enabled</b>',
+        'drupalForm' => array(
           '#type' => 'checkbox',
           '#required' => FALSE,
           '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
-          ),
         ),
       ),
     'artistName' => array(
@@ -105,7 +90,6 @@ class MusicTrack extends RecordStoreComponent {
         '#type' => 'textfield',
         '#maxlength' => 524288,
         '#required' => TRUE,
-        '#description' => 'URL',
         '#attributes' => array(
           'class' => array(
             'miss-file-manage',
@@ -137,24 +121,17 @@ class MusicTrack extends RecordStoreComponent {
         '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
         ),
       ),
-    'genres' => array(
-      'name' => 'Genres',
+    'genre' => array(
+      'name' => 'Genre',
       'drupalForm' => array(
-        '#type' => 'fieldset',
-        '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
-        '#tree' => TRUE,
-        'genre' => array(
-          '#title' => 'Genre',
-          '#type' => 'select',
-          '#options' => $genres,
-          '#empty_value' => '0',
-          '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
-          ),
-        'relatedGenre' => array(
-          'drupalForm' => $relatedGenres,
-          ),
+        '#type' => 'select',
+        '#options' => $genres,
+        '#empty_value' => '0',
+        '#disabled' => !user_access('edit record store content') ? TRUE : FALSE,
         ),
+      ),
+    'relatedGenre' => array(
+      'drupalForm' => $relatedGenres,
       ),
     'musicDates' => array(
       'name' => 'Music Track Dates',
@@ -359,9 +336,7 @@ return $fields;
           break;
 
           case 'status':
-          if ($value !== FALSE) {
-            $query[$key] = $value;
-          }
+          $query['status'] = ($value == 1 ? 0 : 1);
           break;
 
           case 'influence':
@@ -400,6 +375,26 @@ return $fields;
           break;
 
           // Remove text_format extras from Spotlight caption and title
+          case 'label':
+          if (isset($value['label']['value'])) {
+            $query['label'] = $value['label']['value'];
+          }
+          break;
+          case 'performer':
+          if (isset($value['performer']['value'])) {
+            $query['performer'] = $value['performer']['value'];
+          }
+          break;
+          case 'samplesSounds':
+          if (isset($value['samplesSounds']['value'])) {
+            $query['samplesSounds'] = $value['samplesSounds']['value'];
+          }
+          break;
+          case 'show':
+          if (isset($value['show']['value'])) {
+            $query['show'] = $value['show']['value'];
+          }
+          break;
           case 'spotlight':
           $caption = '';
           if (isset($value['caption']['value'])) {

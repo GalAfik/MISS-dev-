@@ -23,7 +23,7 @@ use NMAAHC\MISS\TimelineEvent;
  * The Record Store menu path
  */
 define('MISS_RECORD_STORE_MENU_PATH', 'miss/manage/recordStore');
- 
+
 
 
 /**
@@ -117,7 +117,7 @@ function _miss_record_store_edit_genre_form($form, &$form_state, $genre_id = NUL
 
   $genre_name = isset($genre_name) ? $genre_name : NULL;
   $description_to_use = NULL;
-  
+
   if(isset($genre_id)) {
     $genre_list = _miss_record_store_get_genres_object();
     if (is_array($genre_list)) {
@@ -191,7 +191,7 @@ function _miss_record_store_edit_genre_form_submit($form, &$form_state) {
   $new_name = $form_state['values']['name'];
   $new_description = $form_state['values']['new_description'];
   $genre_list = _miss_record_store_get_genres_object();
-  
+
   if(is_array($genre_list)){
 
     // If a new genre is being updated, assign the new values.
@@ -277,7 +277,7 @@ function _miss_record_store_delete_genre_confirm_submit($form, &$form_state) {
         $form_state['redirect'] = MISS_RECORD_STORE_MENU_PATH;
 
       }
-      
+
     }
   }
 
@@ -348,7 +348,7 @@ function _miss_record_store_content_overview() {
     array('group' => CSS_THEME, 'type' => 'file', 'weight' => 51)
   );
   drupal_add_js(
-    '//cdnjs.cloudflare.com/ajax/libs/datatables/1.10.11/js/jquery.dataTables.min.js', 
+    '//cdnjs.cloudflare.com/ajax/libs/datatables/1.10.11/js/jquery.dataTables.min.js',
     array('scope' => 'footer', 'type' => 'external', 'weight' => 50)
   );
   drupal_add_js(
@@ -413,7 +413,7 @@ function _miss_record_store_content_overview() {
 
       $row = array();
       foreach ($type->fields as $field => $name) {
-        $row['data'][] = strip_tags($value[$field]);
+        $row['data'][] = isset($value[$field]) && !empty($value[$field]) ? strip_tags($value[$field]) : '';
       }
 
       $buttons = l((!user_access('edit miss content') ? 'View' : 'Edit'), MISS_RECORD_STORE_MENU_PATH . '/' . $type->path . '/edit/' . $id, $link_options);
@@ -598,7 +598,7 @@ function _miss_record_store_edit_component_form__record_store__remove_influence(
  *       "Blues": "default description",
  *       "Country": "default description",
  *       ...
- *     }           
+ *     }
  */
 function _miss_record_store_get_genres_object($rs = NULL) {
   //Calling for the records twice in the same REQUEST would give second time as NULL, so implemented this rudimentary caching
@@ -624,7 +624,7 @@ function _miss_record_store_get_genres_object($rs = NULL) {
 
 /**
  * Helper function originally for the genre listing that will preserve array order but rename a specific key
- * since doing 
+ * since doing
  * $array[$new_key] = $array[$old_key]; unset($array[$old_key]);
  * will put the new key at the end of the order
  * Assumes that new_key does not exist in the array

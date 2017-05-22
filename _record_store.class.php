@@ -260,10 +260,26 @@ abstract class RecordStoreComponent extends RecordStore {
    *
    */
   protected function drupalFormTitle($action, $component, $type, $name) {
+    $replace_characters = array(
+      "\xC2\xAB"   => '"', // « (U+00AB) in UTF-8
+      "\xC2\xBB"   => '"', // » (U+00BB) in UTF-8
+      "\xE2\x80\x98" => "'", // ‘ (U+2018) in UTF-8
+      "\xE2\x80\x99" => "'", // ’ (U+2019) in UTF-8
+      "\xE2\x80\x9A" => "'", // ‚ (U+201A) in UTF-8
+      "\xE2\x80\x9B" => "'", // ‛ (U+201B) in UTF-8
+      "\xE2\x80\x9C" => '"', // “ (U+201C) in UTF-8
+      "\xE2\x80\x9D" => '"', // ” (U+201D) in UTF-8
+      "\xE2\x80\x9E" => '"', // „ (U+201E) in UTF-8
+      "\xE2\x80\x9F" => '"', // ‟ (U+201F) in UTF-8
+      "\xE2\x80\xB9" => "'", // ‹ (U+2039) in UTF-8
+      "\xE2\x80\xBA" => "'", // › (U+203A) in UTF-8
+    );
+    $sanitized_name = strtr(strip_tags($name), $replace_characters);
+
     switch ($action) {
       case 'edit':
         if (property_exists($component, 'id')) {
-          $title = sprintf('Edit %s "%s"', $type, $name);
+          $title = sprintf('Edit %s "%s"', $type, trim($sanitized_name, '"'));
         }
         else {
           $title = 'Create ' . $type;
@@ -271,7 +287,7 @@ abstract class RecordStoreComponent extends RecordStore {
         break;
 
       case 'delete':
-        $title = sprintf('Delete %s "%s"', $type, $name);
+        $title = sprintf('Delete %s "%s"', $type, trim($sanitized_name, '"'));
         break;
     }
 
@@ -286,30 +302,44 @@ abstract class RecordStoreComponent extends RecordStore {
     $fields = $this->fields();
 
     foreach ($fields as $key => $field) {
+
+      if ($key == 'status') {
+        $field['drupalForm']['#default_value'] = isset($component->status) && $component->status == 0 ? 1 : 0;
+      }
+
       if (!isset($field['drupalForm'])) {
         continue;
       }
 
       $form[$key] = $field['drupalForm'];
 
-      // Process each fieldset item individually
+      //Process each fieldset item individually
       if ($field['drupalForm']['#type'] == 'fieldset') {
         foreach ($field['drupalForm'] as $fieldset_key => $fieldset_value) {
           if (substr($fieldset_key, 0, 1) == '#') {
             continue;
           }
 
-          $form[$key][$fieldset_key] += array(
-            '#default_value' => !empty($component->content[$key][$fieldset_key]) ? $component->content[$key][$fieldset_key] : '',
-          );
+          // check if field is an rtf and if not set the default value
+          if($fieldset_value['#type'] == 'text_format'){
+            $form[$key][$fieldset_key] += array(
+              '#default_value' => !empty($component->content[$key][$fieldset_key]['value']) ? $component->content[$key][$fieldset_key]['value'] : '',
+            );
+          }else{
+            $form[$key][$fieldset_key] += array(
+              '#default_value' => !empty($component->content[$key][$fieldset_key]) ? $component->content[$key][$fieldset_key] : '',
+            );
+          }
         }
       }
       else {
 
         switch ($key) {
-          case 'status':
+
+          case 'musicTrack':
             $form[$key] += array(
-              '#default_value' => isset($component->status) ? $component->status : 0,
+              '#default_value' => !empty($component->content[$key]) ? $component->content[$key] : '',
+              '#suffix' => !empty($component->content[$key]) ? '<div style="margin-bottom: 1.5rem;"><a href="' . $component->content[$key] . '" target="_blank">Play Preview</a> (opens in a new window/tab)</div>' : '',
             );
             break;
 
