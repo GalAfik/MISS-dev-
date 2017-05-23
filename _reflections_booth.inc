@@ -3,6 +3,52 @@
 /**
  * Implements hook_form().
  */
+function miss_reflections_booth_search_form( $form, &$form_state ) {
+  $form = array();
+  $form['#tree'] = TRUE;
+
+  $form['search'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Filter Video Submissions',
+    '#attributes' => array('class' => array('container-inline')),
+    );
+
+  $form['search']['search_column'] = array(
+    '#type' => 'select',
+    '#title' => t('Field'),
+    '#multiple' => FALSE,
+    '#options' => array(
+      'prompt_question' => 'Prompt Question',
+      'status' => 'Status',
+      'reviewer' => 'Reviewer',
+      'tags' => 'Tags',
+      'age' => 'Age',
+      'gender' => 'Gender',
+      'race' => 'Race / Ethnicity',
+      'group_type' => 'Type of Group',
+      'location' => 'Location',
+      ),
+    '#attributes' => array('placeholder' => t('Filter on ...'), 'style' => ''),
+    );
+
+  $form['search']['search_term'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Value'),
+    '#attributes' => array('style' => ''),
+    );
+
+  $form['search']['search_submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Submit',
+    '#attributes' => array('style' => ''),
+    );
+
+  return $form;
+}
+
+/**
+ * Implements hook_form().
+ */
 function miss_prompt_questions_form( $form, &$form_state, $record = array() ) {
 
   $form = array();
@@ -27,19 +73,19 @@ function miss_prompt_questions_form( $form, &$form_state, $record = array() ) {
 }
 
   // disable gallery tag field if the status is 0 and the user is not an admin
-  global $user;
-  $form['tag'] = array(
-    '#type' => 'textfield',
-    '#maxlength' => 524288,
-    '#title' => t('Gallery Tag'),
-    '#size' => 65,
-    '#maxlength' => 524288,
-    '#required' => TRUE,
-    '#default_value' => !empty($record['galleryTag']) ? $record['galleryTag'] : '',
-    '#prefix' => isset($record['id']) ? '<p><a href="/miss/manage/reflectionsBooth/videos/' . $record['id'] . '">Browse Video Submissions</a></p>' : '',
-    '#suffix' => '<p>Note: The first 4 questions will appear in the kiosk interface.</p>',
-    '#disabled' => (!user_access('edit reflections booth content') && isset($record['status']) && $record['status'] == 1) || (!in_array('administrator', array_values($user->roles)) && isset($record['status']) && $record['status'] == 0) ? TRUE : FALSE,
-    );
+global $user;
+$form['tag'] = array(
+  '#type' => 'textfield',
+  '#maxlength' => 524288,
+  '#title' => t('Gallery Tag'),
+  '#size' => 65,
+  '#maxlength' => 524288,
+  '#required' => TRUE,
+  '#default_value' => !empty($record['galleryTag']) ? $record['galleryTag'] : '',
+  '#prefix' => isset($record['id']) ? '<p><a href="/miss/manage/reflectionsBooth/videos/' . $record['id'] . '">Browse Video Submissions</a></p>' : '',
+  '#suffix' => '<p>Note: The first 4 questions will appear in the kiosk interface.</p>',
+  '#disabled' => (!user_access('edit reflections booth content') && isset($record['status']) && $record['status'] == 1) || (!in_array('administrator', array_values($user->roles)) && isset($record['status']) && $record['status'] == 0) ? TRUE : FALSE,
+  );
 
 $form['gallery_image'] = array(
   '#type' => 'textfield',
@@ -354,7 +400,7 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
 
     $form['moderationField']['moderationHelptext'] = array(
       '#type' => 'fieldset',
-      '#title' => '&#x2753 Deletion Recommendation Guidelines',
+      '#title' => '&#x2753 Deletion Recommendation Guidelines Below',
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
       );
@@ -363,22 +409,22 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
       '#type' => 'item',
       '#markup' => '<i><p>Please recommend recordings with the following features for deletion:</p>
       <ol>
-      <li>Less than 30 seconds long</li>
-      <li>Poor sound or video quality</li>
-      <li>Does not answer the question and/or does not address any of the priority areas listed above. In other words, is generally irrelevant</li>
-      <li>Is offensive (profane, racist, sexist, etc...)</li>
+        <li>Less than 30 seconds long</li>
+        <li>Poor sound or video quality</li>
+        <li>Does not answer the question and/or does not address any of the priority areas listed above. In other words, is generally irrelevant</li>
+        <li>Is offensive (profane, racist, sexist, etc...)</li>
       </ol>
-      </i>',
-      );
+    </i>',
+    );
     $js = "jQuery(document).ready(function(){
-    jQuery('#edit-moderationhelptext').find('.fieldset-legend').css('background-color', '#FFFCE5');
-    jQuery('#edit-moderationhelptext').find('.fieldset-legend')
-    .css('background-image', 'none')
-    .css('background-repeat', 'no-repeat')
-    .css('background-position', 'left center')
-    .css('text-indent', '0px')
-    .css('line-height', '1.95');
-    jQuery('#edit-moderationhelptext').css('margin-bottom', '15px');
+      jQuery('#edit-moderationhelptext').find('.fieldset-legend').css('background-color', '#FFFCE5');
+      jQuery('#edit-moderationhelptext').find('.fieldset-legend')
+      .css('background-image', 'none')
+      .css('background-repeat', 'no-repeat')
+      .css('background-position', 'left center')
+      .css('text-indent', '0px')
+      .css('line-height', '1.95');
+      jQuery('#edit-moderationhelptext').css('margin-bottom', '15px');
     });";
     drupal_add_js($js, 'inline');
 
@@ -467,27 +513,27 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
 
     $form['reviewerSection']['commentsHelptext']['text'] = array(
       '#type' => 'item',
-      '#markup' => '<i><p>In this box, write a summary of the topics/themes covered in the recording.In your brief summary, please make note of the following features, if present:</p>
+      '#markup' => '<i><p>In the box below, write a summary of the topics/themes covered in the recording.In your brief summary, please make note of the following features, if present:</p>
       <ol>
-      <li>Visitor shares memory of a significant historical event, movement, or era (slavery, abolitionism, Civil Rights, Black Power, Black Lives Matter, etc...)</li>
-      <li>Visitor describes a family tradition or detailed genealogy (Juneteenth, Homecoming, family tree)</li>
-      <li>Visitors recalls personal experiencein a significant event of the modern era (Grand Opening of NMAAHC, Inauguration, Women’s march, Science March, etc...)</li>
-      <li>Visitor describes a familial connection to a significant place of location-such as one of the many places featured in our galleries (Tulsa, Edisto, The Bronx).</li>
-      <li>Visitor mentions artifacts, documents, or photographs potentially available to the Museum.</li>
-      <li>Visitor makes a particularly insightful comment about the exhibition itself; things they like, dislike, are confused by, are sure to remember, etc....not general or non-specific comments like “I like it.”</li>
-      <li>Visitor shares a particularly poignant comment or memory (ofcourse, this is your subjective judgement).</li>
+        <li>Visitor shares memory of a significant historical event, movement, or era (slavery, abolitionism, Civil Rights, Black Power, Black Lives Matter, etc...)</li>
+        <li>Visitor describes a family tradition or detailed genealogy (Juneteenth, Homecoming, family tree)</li>
+        <li>Visitors recalls personal experiencein a significant event of the modern era (Grand Opening of NMAAHC, Inauguration, Women’s march, Science March, etc...)</li>
+        <li>Visitor describes a familial connection to a significant place of location-such as one of the many places featured in our galleries (Tulsa, Edisto, The Bronx).</li>
+        <li>Visitor mentions artifacts, documents, or photographs potentially available to the Museum.</li>
+        <li>Visitor makes a particularly insightful comment about the exhibition itself; things they like, dislike, are confused by, are sure to remember, etc....not general or non-specific comments like “I like it.”</li>
+        <li>Visitor shares a particularly poignant comment or memory (ofcourse, this is your subjective judgement).</li>
       </ol>
-      </i>',
-      );
+    </i>',
+    );
     $js = "jQuery(document).ready(function(){
-    jQuery('#edit-commentshelptext').find('.fieldset-legend').css('background-color', '#FFFCE5');
-    jQuery('#edit-commentshelptext').find('.fieldset-legend')
-    .css('background-image', 'none')
-    .css('background-repeat', 'no-repeat')
-    .css('background-position', 'left center')
-    .css('text-indent', '0px')
-    .css('line-height', '1.95');
-    jQuery('#edit-commentshelptext').css('margin-bottom', '20px');
+      jQuery('#edit-commentshelptext').find('.fieldset-legend').css('background-color', '#FFFCE5');
+      jQuery('#edit-commentshelptext').find('.fieldset-legend')
+      .css('background-image', 'none')
+      .css('background-repeat', 'no-repeat')
+      .css('background-position', 'left center')
+      .css('text-indent', '0px')
+      .css('line-height', '1.95');
+      jQuery('#edit-commentshelptext').css('margin-bottom', '20px');
     });";
     drupal_add_js($js, 'inline');
 
@@ -509,7 +555,7 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
         'Child' => 'Child',
         'Teenager' => 'Teenager',
         'Adult' => 'Adult',
-        'Older Adult' => 'Older Adult',
+        'senior' => 'Senior',
         'Mixed Group' => 'Mixed Group',
         ),
       '#disabled' => (user_access('edit reflections booth content') || user_access('review reflections booth content')) ? FALSE : TRUE,
@@ -999,9 +1045,6 @@ function miss_video_submissions_form_submit($form, &$form_state) {
   $uri_set = 'tags=' . json_encode($tags) . '&groupType=' . json_encode($form_state['input']['groupType']) . '&' . $uri . $id;
 
   $set = _miss_send_miss_request( variable_get('reflectionsSetAttractVideo'), $uri_set );
-
-  // Add or remove from the attract loop.
-  // $featured_ids = !empty($form_state['input']['featuredIds']) ? json_decode($form_state['input']['featuredIds'], true) : array();
   $result = _miss_video_submissions_manage_attract_media_loop($set, $form_state, $featured);
 
   // Set an error message if the setting of the attract media loop fails.
@@ -1250,9 +1293,6 @@ function miss_reflections_booth_user_release_form_submit($form, &$form_state) {
  */
 function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId = '', $passed_component_type = 'attract_video', $passed_status = '', $dump = FALSE, $gallery_tags = array(), $prompt_questions = array()) {
 
-  // $backtrace = debug_backtrace();
-  // dumper($backtrace[1]['function'],0);
-
   $default_start = 'start=0';
   $default_length = '&rows=10';
 
@@ -1295,10 +1335,10 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
 
     switch((int)$_GET['order'][0]['column']) {
       case 3:
-        $sort = 'lastTimeUpdated';
-        break;
-    default:
-        $sort = 'lastTimeUpdated';
+      $sort = 'lastTimeUpdated';
+      break;
+      default:
+      $sort = 'lastTimeUpdated';
     }
 
   }
@@ -1318,6 +1358,45 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
   // $uri = $start . $length . $status . $gallery_tag_id . '&componentType=' . $component_type;
   $uri = $start . $length . $status . $gallery_tag_id . '&componentType=' . $component_type . '&sort=' . $sort . '&sortDir=' . $sortDir . '&renderAsArray=true';
 
+
+  // $term = 'gafik';
+  // $search_column = 'reviewer';
+  // switch ($search_column) {
+  //   case 'prompt_question':
+  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
+  //   break;
+  //   case 'status':
+  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
+  //   break;
+  //   case 'reviewer':
+  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
+  //   break;
+  //   case 'tags':
+  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
+  //   break;
+  //   case 'age':
+  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
+  //   break;
+  //   case 'gender':
+  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
+  //   break;
+  //   case 'race':
+  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
+  //   break;
+  //   case 'group_type':
+  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
+  //   break;
+  //   case 'location':
+  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
+  //   break;
+  //   default:
+  //   $fq = '';
+  //   break;
+  // }
+  // $uri .= '&fq=' . $fq;
+
+
+
   // Get the components.
   $items = _miss_send_miss_request( $endpoint, $uri );
 
@@ -1325,56 +1404,56 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
 
     case 'gallery_tag':
 
-      $data['data'] = $items;
-      return $data;
-      break;
+    $data['data'] = $items;
+    return $data;
+    break;
 
     case 'prompt_question':
 
-      $endpoint = 'miss/v1.0/nmaahc/reflections_booth/getComponents.htm';
-      $uri = 'start=0&rows=100&status=0&componentType=prompt_question';
-      $prompt_questions = _miss_send_miss_request( $endpoint, $uri );
+    $endpoint = 'miss/v1.0/nmaahc/reflections_booth/getComponents.htm';
+    $uri = 'start=0&rows=100&status=0&componentType=prompt_question';
+    $prompt_questions = _miss_send_miss_request( $endpoint, $uri );
 
-      $data['data'] = $prompt_questions;
-      return $data;
+    $data['data'] = $prompt_questions;
+    return $data;
 
-      break;
+    break;
 
     case 'attract_video':
 
-      if(empty($prompt_questions)) {
-        $endpoint = 'miss/v1.0/nmaahc/reflections_booth/getComponents.htm';
-        $uri = 'start=0&rows=100&status=0&componentType=prompt_question';
-        $prompt_questions = _miss_send_miss_request( $endpoint, $uri );
-      }
+    if(empty($prompt_questions)) {
+      $endpoint = 'miss/v1.0/nmaahc/reflections_booth/getComponents.htm';
+      $uri = 'start=0&rows=100&status=0&componentType=prompt_question';
+      $prompt_questions = _miss_send_miss_request( $endpoint, $uri );
+    }
 
-      $i = 0;
+    $i = 0;
         // All videos.
-      foreach($items['components'] as $record_value) {
+    foreach($items['components'] as $record_value) {
 
-        $result[$i] = $record_value;
+      $result[$i] = $record_value;
 
           // Set the status of the item.
-        $result[$i]['content_processed']['status'] = (isset($record_value['content']['featured']) && $record_value['content']['featured']) ? '<span style="color: #069E2D;font-weight:bold;">Featured</span>' : ($record_value['status'] == 0 ? 'Approved' : 'Pending');
+      $result[$i]['content_processed']['status'] = (isset($record_value['content']['featured']) && $record_value['content']['featured']) ? '<span style="color: #069E2D;font-weight:bold;">Featured</span>' : ($record_value['status'] == 0 ? 'Approved' : 'Pending');
 
-        $result[$i]['content_processed']['status'] .= (isset($record_value['content']['deletionRecommendation']) && $record_value['content']['deletionRecommendation']) ? ' <span style="color: red;">(Deletion is Recommended)</span>' : '';
+      $result[$i]['content_processed']['status'] .= (isset($record_value['content']['deletionRecommendation']) && $record_value['content']['deletionRecommendation']) ? ' <span style="color: red;">(Deletion is Recommended)</span>' : '';
 
           // Get timestamp for the table.
-        $time = (isset($record_value['lastTimeUpdated']) && $record_value['lastTimeUpdated']) ? $record_value['lastTimeUpdated'] : 'N/A';
-        $datetime = DateTime::createFromFormat( 'Y-m-d H:i:s.u', $time, new DateTimeZone('America/New_York'));
-        $result[$i]['content_processed']['timestamp'] = $datetime->format('m/d/Y g:i A');
+      $time = (isset($record_value['lastTimeUpdated']) && $record_value['lastTimeUpdated']) ? $record_value['lastTimeUpdated'] : 'N/A';
+      $datetime = DateTime::createFromFormat( 'Y-m-d H:i:s.u', $time, new DateTimeZone('America/New_York'));
+      $result[$i]['content_processed']['timestamp'] = $datetime->format('m/d/Y g:i A');
 
         // $result[$i]['content_processed']['timestamp'] = $time;
 
-        $result[$i]['content_processed']['thumb'] = (isset($record_value['content']['videoThumbnailImageUrl']) && !empty($record_value['content']['videoThumbnailImageUrl']))
-        ? '<img src="' . $record_value['content']['videoThumbnailImageUrl'] . '" alt="Thumbnail image file">'
-        : '';
-        $result[$i]['content_processed']['question'] = (!empty($prompt_questions) && isset($prompt_questions['components'][$record_value['content']['promptQuestionId']]))
-        ? $prompt_questions['components'][$record_value['content']['promptQuestionId']]['content']['text']
-        : 'Question Not Set';
+      $result[$i]['content_processed']['thumb'] = (isset($record_value['content']['videoThumbnailImageUrl']) && !empty($record_value['content']['videoThumbnailImageUrl']))
+      ? '<img src="' . $record_value['content']['videoThumbnailImageUrl'] . '" alt="Thumbnail image file">'
+      : '';
+      $result[$i]['content_processed']['question'] = (!empty($prompt_questions) && isset($prompt_questions['components'][$record_value['content']['promptQuestionId']]))
+      ? $prompt_questions['components'][$record_value['content']['promptQuestionId']]['content']['text']
+      : 'Question Not Set';
 
-        $result[$i]['content_processed']['reviewer'] = (isset($record_value['content']['reviewer']) && !empty($record_value['content']['reviewer']))
-        ? $record_value['content']['reviewer'] : 'Not Reviewed';
+      $result[$i]['content_processed']['reviewer'] = (isset($record_value['content']['reviewer']) && !empty($record_value['content']['reviewer']))
+      ? $record_value['content']['reviewer'] : 'Not Reviewed';
 
         // $tag_names_array = array();
         // if(isset($record_value['content']['tags']) && !empty($record_value['content']['tags'])){
@@ -1386,57 +1465,57 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
         //   $result[$i]['content_processed']['tags'] = 'None';
         // }
 
-        if(isset($record_value['content']['tags']) && !empty($record_value['content']['tags'])){
-          $result[$i]['content_processed']['tags'] = implode(', ', $record_value['content']['tags']);
-        }else{
-          $result[$i]['content_processed']['tags'] = 'None';
-        }
+      if(isset($record_value['content']['tags']) && !empty($record_value['content']['tags'])){
+        $result[$i]['content_processed']['tags'] = implode(', ', $record_value['content']['tags']);
+      }else{
+        $result[$i]['content_processed']['tags'] = 'None';
+      }
 
-        $result[$i]['content_processed']['age'] = (isset($record_value['content']['age']) && !empty($record_value['content']['age']))
-        ? $record_value['content']['age'] : 'Not Set';
+      $result[$i]['content_processed']['age'] = (isset($record_value['content']['age']) && !empty($record_value['content']['age']))
+      ? $record_value['content']['age'] : 'Not Set';
 
-        $result[$i]['content_processed']['gender'] = (isset($record_value['content']['gender']) && !empty($record_value['content']['gender']))
-        ? $record_value['content']['gender'] : 'Not Set';
+      $result[$i]['content_processed']['gender'] = (isset($record_value['content']['gender']) && !empty($record_value['content']['gender']))
+      ? $record_value['content']['gender'] : 'Not Set';
 
-        $result[$i]['content_processed']['race'] = (isset($record_value['content']['race']) && !empty($record_value['content']['race']))
-        ? $record_value['content']['race'] : 'Not Set';
+      $result[$i]['content_processed']['race'] = (isset($record_value['content']['race']) && !empty($record_value['content']['race']))
+      ? $record_value['content']['race'] : 'Not Set';
 
-        $result[$i]['content_processed']['groupType'] = (isset($record_value['content']['groupType']) && !empty($record_value['content']['groupType']))
-        ? $record_value['content']['groupType'] : 'Not Set';
+      $result[$i]['content_processed']['groupType'] = (isset($record_value['content']['groupType']) && !empty($record_value['content']['groupType']))
+      ? $record_value['content']['groupType'] : 'Not Set';
 
-        $result[$i]['content_processed']['location'] = (isset($record_value['content']['location']) && !empty($record_value['content']['location'])) ? $record_value['content']['location'] : '';
-        $result[$i]['content_processed']['location'] .= (isset($record_value['content']['location']) && !empty($record_value['content']['location']) && isset($record_value['content']['region']) && !empty($record_value['content']['region'])) ? ', ' : '';
-        $result[$i]['content_processed']['location'] .= (isset($record_value['content']['region']) && !empty($record_value['content']['region'])) ? $record_value['content']['region'] : '';
-        if(empty($result[$i]['content_processed']['location'])){
-          $result[$i]['content_processed']['location'] = 'Not Set';
-        }
+      $result[$i]['content_processed']['location'] = (isset($record_value['content']['location']) && !empty($record_value['content']['location'])) ? $record_value['content']['location'] : '';
+      $result[$i]['content_processed']['location'] .= (isset($record_value['content']['location']) && !empty($record_value['content']['location']) && isset($record_value['content']['region']) && !empty($record_value['content']['region'])) ? ', ' : '';
+      $result[$i]['content_processed']['location'] .= (isset($record_value['content']['region']) && !empty($record_value['content']['region'])) ? $record_value['content']['region'] : '';
+      if(empty($result[$i]['content_processed']['location'])){
+        $result[$i]['content_processed']['location'] = 'Not Set';
+      }
 
-        $result[$i]['content_processed']['deletionRecommendation'] = (isset($record_value['content']['deletionRecommendation']) && !empty($record_value['content']['deletionRecommendation']))
-        ? $record_value['content']['deletionRecommendation'] : false;
+      $result[$i]['content_processed']['deletionRecommendation'] = (isset($record_value['content']['deletionRecommendation']) && !empty($record_value['content']['deletionRecommendation']))
+      ? $record_value['content']['deletionRecommendation'] : false;
 
 
-        $result[$i]['content_processed']['recordId'] = $record_value['id'];
+      $result[$i]['content_processed']['recordId'] = $record_value['id'];
 
-        $gallery_tag_id_parts = explode('=', $gallery_tag_id);
-        $result[$i]['content_processed']['galleryTagId'] = $gallery_tag_id_parts[1];
+      $gallery_tag_id_parts = explode('=', $gallery_tag_id);
+      $result[$i]['content_processed']['galleryTagId'] = $gallery_tag_id_parts[1];
           // Featured counter.
-        if(isset($record_value['content']['featured']) && $record_value['content']['featured']) $featured[] = '';
+      if(isset($record_value['content']['featured']) && $record_value['content']['featured']) $featured[] = '';
 
-        $i++;
+      $i++;
 
-      }
+    }
 
-      $data['data'] = $result;
-      $data['recordsTotal'] = count($items['components']);
-      $data['recordsFiltered'] = $items['componentCount'];
+    $data['data'] = $result;
+    $data['recordsTotal'] = count($items['components']);
+    $data['recordsFiltered'] = $items['componentCount'];
 
-      if(!$json || $dump) {
-        return $data;
-      } else {
-        echo json_encode($data);
-      }
+    if(!$json || $dump) {
+      return $data;
+    } else {
+      echo json_encode($data);
+    }
 
-      break;
+    break;
   }
 
 }
@@ -1474,9 +1553,6 @@ function _miss_reflections_booth_page_build($interactive = '') {
   /////////////////////////////////////////////
   if(!empty($path_parts[5])) {
 
-    // Get all of the records.
-    // $result = _miss_send_miss_request( variable_get('reflectionsRender') );
-
     // Get the record.
     // miss/v1.0/nmaahc/miss_content/getContent.htm
     $endpoint = 'miss/v1.0/nmaahc/miss_content/getContent.htm';
@@ -1492,14 +1568,6 @@ function _miss_reflections_booth_page_build($interactive = '') {
     $data['page']['record']['id'] = $item['id'];
     $data['page']['record']['status'] = $item['status'];
     $data['page']['record']['last_time_updated'] = $item['lastTimeUpdated'];
-
-    // // Compile an array of ids of featured videos in the attract media loop.
-    // $data['page']['record']['featuredIds'] = array();
-    // foreach ($data['record']['all_videos'] as $video_key => $video_value) {
-    //   if(isset($video_value['content']['featured']) && $video_value['content']['featured']) {
-    //     array_push($data['page']['record']['featuredIds'], $video_value['id']);
-    //   }
-    // }
 
     // EDAN record dump
     if(!empty($data['page']['record']) && isset($_GET['dump']) && (variable_get('allow_dump') === '2')) {
@@ -1550,12 +1618,12 @@ function _miss_reflections_booth_page_build($interactive = '') {
       );
 
     $chosen_js = "
-      jQuery(document).ready(function($) {
-        $('#edit-tags').chosen();
-        $('#edit-grouptype').chosen();
-      });
-      ";
-      drupal_add_js($chosen_js, 'inline');
+    jQuery(document).ready(function($) {
+      $('#edit-tags').chosen();
+      $('#edit-grouptype').chosen();
+    });
+    ";
+    drupal_add_js($chosen_js, 'inline');
 
     // Get the form.
     $form = drupal_get_form('miss_video_submissions_form', $data['page']['record']);
@@ -1631,10 +1699,6 @@ function _miss_reflections_booth_page_build($interactive = '') {
           $unapproved_record_count = $gallery['content']['counts'][1]['count'];
         }
       }
-      // $approved_records = _miss_rb_video_submissions_callback(FALSE, $value['id'], 'attract_video', 0);
-      // $unapproved_records = _miss_rb_video_submissions_callback(FALSE, $value['id'], 'attract_video', 1);
-      // $approved_record_count = ($approved_records['recordsFiltered'] - $unapproved_records['recordsFiltered']);
-      // $unapproved_record_count = $unapproved_records['recordsFiltered'];
 
       $data['page'] .= '<tr>' . "\n";
       $data['page'] .= '<td><strong>' . $value['content']['galleryTag'] . '</strong></td>' . "\n";
@@ -1693,13 +1757,6 @@ function _miss_reflections_booth_page_build($interactive = '') {
         drupal_get_path('module', 'miss') . '/css/_reflections_booth.css',
         array('group' => CSS_THEME, 'type' => 'file', 'weight' => 1)
         );
-
-        // // Javascript
-        // drupal_add_library('system','ui.sortable');
-        // drupal_add_js(
-        //   drupal_get_path('module', 'miss') . '/js/_reflections_booth.js',
-        //   array('scope' => 'footer', 'weight' => 1)
-        // );
 
       $data['page']['record'] = array();
         // Get the record from EDAN.
@@ -1855,6 +1912,9 @@ function _miss_reflections_booth_page_build($interactive = '') {
           ';
           drupal_add_js($tabs_script, 'inline');
 
+          $search_form = drupal_get_form('miss_reflections_booth_search_form');
+          $out .= drupal_render($search_form);
+
             // Setting up responsive tabs.
           $out .= '<div id="tabsElement">' . "\n";
 
@@ -1940,10 +2000,6 @@ function _miss_reflections_booth_page_build($interactive = '') {
 
 
       case 'stats':
-
-
-        // Get all of the records.
-        // $record = _miss_send_miss_request( variable_get('reflectionsRender') );
 
       drupal_add_js(drupal_get_path('module', 'miss') . '/plugins/highcharts/highcharts.js');
       if(isset($_GET["theme"])){
