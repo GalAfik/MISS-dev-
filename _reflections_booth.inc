@@ -37,10 +37,32 @@ function miss_reflections_booth_search_form( $form, &$form_state ) {
     '#attributes' => array('style' => ''),
     );
 
-  $form['search']['search_submit'] = array(
+  $form['search']['search_filter'] = array(
     '#type' => 'submit',
-    '#value' => 'Submit',
-    '#attributes' => array('style' => ''),
+    '#name' => 'filter',
+    '#value' => 'Filter',
+    '#attributes' => array('style' => 'background: #008cba; color: #fff; -webkit-border-radius: 0; border-radius: 0;'),
+    );
+
+  $js_add_css = '
+ jQuery(document).ready(function() {
+  jQuery("#edit-search-search-filter").hover(
+  function() {
+    jQuery("#edit-search-search-filter").css("background", "#0079a1")
+  },
+  function() {
+    jQuery("#edit-search-search-filter").css("background", "#008cba")
+  }
+  );
+ });
+ ';
+  drupal_add_js($js_add_css, 'inline');
+
+  $form['search']['search_clear'] = array(
+    '#type' => 'submit',
+    '#name' => 'clear',
+    '#value' => 'Clear',
+    '#attributes' => array('style' => '-webkit-border-radius: 0; border-radius: 0;'),
     );
 
   return $form;
@@ -1242,6 +1264,14 @@ function _miss_get_gallery_data($gallery_tags = false, $path_part = false) {
   return $data;
 }
 
+function _miss_reflections_booth_get_prompt_question_id( $text = '', $gallery_tag_id = 0 ){
+  $results = _miss_send_miss_request( variable_get('reflectionsRender') );
+  foreach ($results['galleryTags'][$gallery_tag_id]['promptQuestions'] as $value) {
+    if ($text == $value['text']) return $value['id'];
+  }
+  return '';
+}
+
 /**
  * Implements hook_form().
  */
@@ -1345,6 +1375,60 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
 
   $sortDir = (isset($_GET['order']) && !empty($_GET['order'])) ? (string)$_GET['order'][0]['dir'] : 'asc';
 
+
+  $get_search_field = filter_input(INPUT_GET, 'search_field', FILTER_SANITIZE_STRING);
+  $get_search_value = filter_input(INPUT_GET, 'search_column', FILTER_SANITIZE_STRING);
+
+  $fq = '';
+  if(isset($get_search_field) && !empty($get_search_field)) {
+    switch ($get_search_field) {
+      case 'prompt_question':
+      $prompt_question_id = _miss_reflections_booth_get_prompt_question_id( $get_search_value, $gallery_tag_id );
+      $fq = array('p.miss_component.content.promptQuestionId:' . $prompt_question_id);
+      break;
+      case 'status':
+        switch ($get_search_value) {
+          case 'Featured' || 'featured':
+          $fq = array('p.miss_component.content.featured:true');
+            break;
+
+          case 'Approved ' || 'approved':
+          $fq = array('p.miss_component.status:0', 'p.miss_component.content.featured:false');
+            break;
+
+          case 'Pending ' || 'pending':
+          $fq = array('p.miss_component.status:1');
+            break;
+
+          case 'Deletion is Recommended':
+          $fq = array('p.miss_component.content.deletionRecommendation:true');
+            break;
+        }
+      break;
+      case 'reviewer':
+      $fq = array('p.miss_component.content.reviewer:' . $get_search_value);
+      break;
+      // case 'tags':
+      // $fq = array('p.miss_component.content.tags:' . $get_search_value);
+      // break;
+      case 'age':
+      $fq = array('p.miss_component.content.age:' . $get_search_value);
+      break;
+      case 'gender':
+      $fq = array('p.miss_component.content.gender:' . $get_search_value);
+      break;
+      case 'race':
+      $fq = array('p.miss_component.content.race:' . $get_search_value);
+      break;
+      // case 'group_type':
+      // $fq = array('p.miss_component.content.group_type:' . $get_search_value);
+      // break;
+      // case 'location':
+      // $fq = array('p.miss_component.content.location:' . $get_search_value);
+      // break;
+    }
+  }
+
   // Parameters:
   // start, rows, sort, sortDir...
   // Acceptable sort parameter arguments:
@@ -1356,45 +1440,7 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
   $endpoint = 'miss/v1.0/nmaahc/reflections_booth/getComponents.htm';
 
   // $uri = $start . $length . $status . $gallery_tag_id . '&componentType=' . $component_type;
-  $uri = $start . $length . $status . $gallery_tag_id . '&componentType=' . $component_type . '&sort=' . $sort . '&sortDir=' . $sortDir . '&renderAsArray=true';
-
-
-  // $term = 'gafik';
-  // $search_column = 'reviewer';
-  // switch ($search_column) {
-  //   case 'prompt_question':
-  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
-  //   break;
-  //   case 'status':
-  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
-  //   break;
-  //   case 'reviewer':
-  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
-  //   break;
-  //   case 'tags':
-  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
-  //   break;
-  //   case 'age':
-  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
-  //   break;
-  //   case 'gender':
-  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
-  //   break;
-  //   case 'race':
-  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
-  //   break;
-  //   case 'group_type':
-  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
-  //   break;
-  //   case 'location':
-  //   $fq = array('p.edanmdm.descriptivenonrepeating.record_id:' . $term);
-  //   break;
-  //   default:
-  //   $fq = '';
-  //   break;
-  // }
-  // $uri .= '&fq=' . $fq;
-
+  $uri = $start . $length . $status . $gallery_tag_id . '&componentType=' . $component_type . '&sort=' . $sort . '&sortDir=' . $sortDir . '&renderAsArray=true' . '&fq=' . $fq;
 
 
   // Get the components.

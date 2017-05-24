@@ -97,7 +97,7 @@ jQuery(document).ready(function($) {
     // Show / hide notification of table processing.
     // https://datatables.net/reference/event/processing
     $('#processingIndicator').css( 'display', processing ? 'block' : 'none' );
-  }).dataTable({
+  }).DataTable({
     "columns": [
     { "data": "content_processed.thumb" },
     { "data": "content_processed.question" },
@@ -131,6 +131,11 @@ jQuery(document).ready(function($) {
       "data": function ( d ) {
         d.gallery_tag_id = galleryTagId;
         d.status = '0';
+
+        // Retrieve dynamic parameters
+          var dt_params = $('#browse_reflections_booth_videos').data('dt_params');
+        // Add dynamic parameters to the data object sent to the server
+        if(dt_params){ $.extend(d, dt_params); }
       }
     },
     // Method type.
@@ -158,6 +163,24 @@ jQuery(document).ready(function($) {
     }
   });
 
+  // on filter button click, set the search field and value and load a new ajax call
+  $('#edit-search-search-filter').on('click', function(e){
+    e.preventDefault();
+    var search_field = $('#edit-search-search-column').val(),
+        search_value = $('#edit-search-search-term').val();
+
+    $('#browse_reflections_booth_videos').data('dt_params', { search_field: search_field, search_value: search_value });
+    $('#browse_reflections_booth_videos').DataTable().draw();
+  });
+
+  // Clear the filter. Unlike normal filters in Datatables,
+  // custom filters need to be removed from the afnFiltering array.
+  $('#edit-search-search-clear').on('click', function(e){
+    e.preventDefault();
+    $('#browse_reflections_booth_videos').data('dt_params', { search_field: '', search_value: '' });
+    $('#browse_reflections_booth_videos').DataTable().draw();
+  });
+
   // jQuery Datatables - Reflections Booth Videos - Unapproved
   $('#browse_reflections_booth_videos_unapproved').on('init.dt', function(){
     // Do stuff here upon initialization, if need be...
@@ -166,7 +189,7 @@ jQuery(document).ready(function($) {
     // Show / hide notification of table processing.
     // https://datatables.net/reference/event/processing
     $('#processingIndicator').css( 'display', processing ? 'block' : 'none' );
-  }).dataTable({
+  }).DataTable({
     "columns": [
     { "data": "content_processed.thumb" },
     { "data": "content_processed.question" },
