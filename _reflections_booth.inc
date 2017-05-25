@@ -1560,7 +1560,7 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
     }
 
     $data['data'] = $result;
-    $data['recordsTotal'] = count($items['components']);
+    $data['recordsTotal'] = count($items['rows']);
     $data['recordsFiltered'] = $items['componentCount'];
 
     if(!$json || $dump) {
