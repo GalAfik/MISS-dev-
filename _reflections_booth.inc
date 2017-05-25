@@ -1266,10 +1266,11 @@ function _miss_get_gallery_data($gallery_tags = false, $path_part = false) {
 
 function _miss_reflections_booth_get_prompt_question_id( $text = '', $gallery_tag_id = 0 ){
   $results = _miss_send_miss_request( variable_get('reflectionsRender') );
+  $matching_questions = array();
   foreach ($results['galleryTags'][$gallery_tag_id]['promptQuestions'] as $value) {
-    if ($text == $value['text']) return $value['id'];
+    if (strpos($value['text'], $text) !== false) array_push($matching_questions, $value['id']);
   }
-  return '';
+  return $matching_questions;
 }
 
 /**
@@ -1377,55 +1378,55 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
 
 
   $get_search_field = filter_input(INPUT_GET, 'search_field', FILTER_SANITIZE_STRING);
-  $get_search_value = filter_input(INPUT_GET, 'search_column', FILTER_SANITIZE_STRING);
+  $get_search_value = filter_input(INPUT_GET, 'search_value', FILTER_SANITIZE_STRING);
 
-  $fq = '';
+  $fq = array();
   if(isset($get_search_field) && !empty($get_search_field)) {
     switch ($get_search_field) {
       case 'prompt_question':
-      $prompt_question_id = _miss_reflections_booth_get_prompt_question_id( $get_search_value, $gallery_tag_id );
-      $fq = array('p.miss_component.content.promptQuestionId:' . $prompt_question_id);
+      $matching_questions_ids = _miss_reflections_booth_get_prompt_question_id( $get_search_value, $gallery_tag_id );
+      foreach ($matching_questions_ids as $value) {
+        array_push( $fq, 'promptquestionid:' . $value );
+      }
       break;
       case 'status':
-        switch ($get_search_value) {
-          case 'Featured' || 'featured':
-          $fq = array('p.miss_component.content.featured:true');
-            break;
-
-          case 'Approved ' || 'approved':
-          $fq = array('p.miss_component.status:0', 'p.miss_component.content.featured:false');
-            break;
-
-          case 'Pending ' || 'pending':
-          $fq = array('p.miss_component.status:1');
-            break;
-
-          case 'Deletion is Recommended':
-          $fq = array('p.miss_component.content.deletionRecommendation:true');
-            break;
+        if (strpos('Featured', $get_search_value) !== false) {
+          array_push($fq, 'featured:true');
+        }
+        if (strpos('Approved', $get_search_value) !== false) {
+          array_push($fq, 'status:0');
+          array_push($fq, 'featured:false');
+        }
+        if (strpos('Pending', $get_search_value) !== false) {
+          array_push($fq, 'status:1');
+        }
+        if (strpos('Deletion is Recommended', $get_search_value) !== false) {
+          array_push($fq, 'deletionrecommendation:true');
         }
       break;
+      // must match exactly
       case 'reviewer':
-      $fq = array('p.miss_component.content.reviewer:' . $get_search_value);
+      array_push($fq, 'reviewer:' . $get_search_value);
       break;
       // case 'tags':
-      // $fq = array('p.miss_component.content.tags:' . $get_search_value);
+      // $fq = array('tags:' . $get_search_value);
       // break;
       case 'age':
-      $fq = array('p.miss_component.content.age:' . $get_search_value);
+      array_push($fq, 'age:' . $get_search_value);
       break;
       case 'gender':
-      $fq = array('p.miss_component.content.gender:' . $get_search_value);
+      array_push($fq, 'gender:' . $get_search_value);
       break;
       case 'race':
-      $fq = array('p.miss_component.content.race:' . $get_search_value);
+      array_push($fq, 'race:' . $get_search_value);
       break;
       // case 'group_type':
-      // $fq = array('p.miss_component.content.group_type:' . $get_search_value);
+      // $fq = array('group_type:' . $get_search_value);
       // break;
-      // case 'location':
-      // $fq = array('p.miss_component.content.location:' . $get_search_value);
-      // break;
+      case 'location':
+      array_push($fq, 'location:' . $get_search_value);
+      array_push($fq, 'region:' . $get_search_value);
+      break;
     }
   }
 
@@ -1437,11 +1438,18 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
   // start=0&rows=50&sort=timestamp&sortDir=desc
   // TODO: Need to add search, if possible... example:
   // start=0&rows=50&sort=timestamp&sortDir=desc&q=place_search_query_here
-  $endpoint = 'miss/v1.0/nmaahc/reflections_booth/getComponents.htm';
+  $endpoint = 'miss/v1.0/nmaahc/reflections_booth/getVideoSubmissions.htm';
 
   // $uri = $start . $length . $status . $gallery_tag_id . '&componentType=' . $component_type;
-  $uri = $start . $length . $status . $gallery_tag_id . '&componentType=' . $component_type . '&sort=' . $sort . '&sortDir=' . $sortDir . '&renderAsArray=true' . '&fq=' . $fq;
+   $uri = $start . $length . $status . $gallery_tag_id . '&componentType=' . $component_type . '&sort=' . $sort . '&sortDir=' . $sortDir . '&renderAsArray=true';
 
+  // only add fq onto the query uri if it is not empty
+  if (!empty($fq)){
+    $uri .= '&fq=';
+    foreach ($fq as $value) {
+      $uri .= $value;
+    }
+  }
 
   // Get the components.
   $items = _miss_send_miss_request( $endpoint, $uri );
@@ -1475,7 +1483,7 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
 
     $i = 0;
         // All videos.
-    foreach($items['components'] as $record_value) {
+    foreach($items['rows'] as $record_value) {
 
       $result[$i] = $record_value;
 
