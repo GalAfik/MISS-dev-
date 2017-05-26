@@ -1691,7 +1691,7 @@ function _miss_reflections_booth_page_build($interactive = '') {
     drupal_set_title($title . ': Browse');
 
     // Get all of the gallery tags.
-    $gallery_tags = _miss_rb_video_submissions_callback(FALSE, FALSE, 'gallery_tag');
+    $gallery_tags = _miss_send_miss_request('miss/v1.0/nmaahc/reflections_booth/getGalleries.htm');
 
     // Add a new set of prompt questions link.
     $data['page'] = '<p>' . l(t('Add a New Set of Prompt Questions'), 'miss/manage/reflectionsBooth/add') . '<br>' . "\n";
@@ -1736,19 +1736,10 @@ function _miss_reflections_booth_page_build($interactive = '') {
     $data['page'] .= '<tbody>' . "\n";
 
     // Loop through all of the records to build the table rows.
-    foreach($gallery_tags['data']['components'] as $key => $value) {
+    foreach($gallery_tags['rows'] as $key => $value) {
 
-      // Query for the approved and unapproved record counts
-      $video_count_results = _miss_send_miss_request('miss/v1.0/nmaahc/reflections_booth/getGalleries.htm');
-      $approved_record_count = 0;
-      $unapproved_record_count = 0;
-
-      foreach ($video_count_results['rows'] as $gallery) {
-        if ($gallery['id'] == $value['id']) {
-          $approved_record_count = $gallery['content']['counts'][0]['count'];
-          $unapproved_record_count = $gallery['content']['counts'][1]['count'];
-        }
-      }
+      $approved_record_count = isset($value['content']['counts'][0]['count']) ? $value['content']['counts'][0]['count'] : 0;
+      $unapproved_record_count = isset($value['content']['counts'][1]['count']) ? $value['content']['counts'][1]['count'] : 0;
 
       $data['page'] .= '<tr>' . "\n";
       $data['page'] .= '<td><strong>' . $value['content']['galleryTag'] . '</strong></td>' . "\n";
