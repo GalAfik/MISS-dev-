@@ -26,7 +26,8 @@ function miss_reflections_booth_search_form( $form, &$form_state ) {
       'gender' => 'Gender',
       'race' => 'Race / Ethnicity',
       // 'group_type' => 'Type of Group',
-      // 'location' => 'Location',
+      'location' => 'City',
+      'region' => 'State',
       ),
     '#attributes' => array('placeholder' => t('Filter on ...'), 'style' => ''),
     );
@@ -1376,7 +1377,6 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
 
   $sortDir = (isset($_GET['order']) && !empty($_GET['order'])) ? (string)$_GET['order'][0]['dir'] : 'asc';
 
-
   $get_search_field = filter_input(INPUT_GET, 'search_field', FILTER_SANITIZE_STRING);
   $get_search_value = filter_input(INPUT_GET, 'search_value', FILTER_SANITIZE_STRING);
 
@@ -1416,10 +1416,12 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
       // case 'group_type':
       // $fq = array('group_type:' . $get_search_value);
       // break;
-      // case 'location':
-      // array_push($fq, 'location:' . $get_search_value);
-      // array_push($fq, 'region:' . $get_search_value);
-      // break;
+      case 'location':
+      array_push($fq, 'location:' . $get_search_value);
+      break;
+      case 'region':
+      array_push($fq, 'region:' . $get_search_value);
+      break;
     }
   }
 
@@ -1431,7 +1433,22 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
   // start=0&rows=50&sort=timestamp&sortDir=desc
   // TODO: Need to add search, if possible... example:
   // start=0&rows=50&sort=timestamp&sortDir=desc&q=place_search_query_here
-  $endpoint = 'miss/v1.0/nmaahc/reflections_booth/getVideoSubmissions.htm';
+
+  // use getComponents if we don't need to use getVideoSubmissions
+  switch($component_type) {
+    case 'gallery_tag':
+    $endpoint = 'miss/v1.0/nmaahc/reflections_booth/getComponents.htm';
+    break;
+    case 'prompt_question':
+    $endpoint = 'miss/v1.0/nmaahc/reflections_booth/getComponents.htm';
+    break;
+    case 'attract_video':
+    $endpoint = 'miss/v1.0/nmaahc/reflections_booth/getVideoSubmissions.htm';
+    break;
+    default:
+    $endpoint = 'miss/v1.0/nmaahc/reflections_booth/getVideoSubmissions.htm';
+    break;
+  }
 
   // $uri = $start . $length . $status . $gallery_tag_id . '&componentType=' . $component_type;
    $uri = $start . $length . $status . $gallery_tag_id . '&componentType=' . $component_type . '&sort=' . $sort . '&sortDir=' . $sortDir . '&renderAsArray=true';
