@@ -133,7 +133,7 @@ jQuery(document).ready(function($) {
         d.status = '0';
 
         // Retrieve dynamic parameters
-          var dt_params = $('#browse_reflections_booth_videos').data('dt_params');
+        var dt_params = $('#browse_reflections_booth_videos').data('dt_params');
         // Add dynamic parameters to the data object sent to the server
         if(dt_params){ $.extend(d, dt_params); }
       }
@@ -171,14 +171,19 @@ jQuery(document).ready(function($) {
 
     $('#browse_reflections_booth_videos').data('dt_params', { search_field: search_field, search_value: search_value });
     $('#browse_reflections_booth_videos').DataTable().draw();
+    $('#browse_reflections_booth_videos_unapproved').data('dt_params', { search_field: search_field, search_value: search_value });
+    $('#browse_reflections_booth_videos_unapproved').DataTable().draw();
   });
 
   // Clear the filter. Unlike normal filters in Datatables,
   // custom filters need to be removed from the afnFiltering array.
   $('#edit-search-search-clear').on('click', function(e){
     e.preventDefault();
+    $('#edit-search-search-term').val('');
     $('#browse_reflections_booth_videos').data('dt_params', { search_field: '', search_value: '' });
     $('#browse_reflections_booth_videos').DataTable().draw();
+    $('#browse_reflections_booth_videos_unapproved').data('dt_params', { search_field: '', search_value: '' });
+    $('#browse_reflections_booth_videos_unapproved').DataTable().draw();
   });
 
   // jQuery Datatables - Reflections Booth Videos - Unapproved
@@ -223,6 +228,11 @@ jQuery(document).ready(function($) {
       "data": function ( d ) {
         d.gallery_tag_id = galleryTagId;
         d.status = '1';
+
+        // Retrieve dynamic parameters
+        var dt_params = $('#browse_reflections_booth_videos_unapproved').data('dt_params');
+        // Add dynamic parameters to the data object sent to the server
+        if(dt_params){ $.extend(d, dt_params); }
       }
     },
     // Method type.

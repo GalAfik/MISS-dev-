@@ -18,15 +18,15 @@ function miss_reflections_booth_search_form( $form, &$form_state ) {
     '#title' => t('Field'),
     '#multiple' => FALSE,
     '#options' => array(
-      'prompt_question' => 'Prompt Question',
+      // 'prompt_question' => 'Prompt Question',
       'status' => 'Status',
       'reviewer' => 'Reviewer',
-      'tags' => 'Tags',
+      // 'tags' => 'Tags',
       'age' => 'Age',
       'gender' => 'Gender',
       'race' => 'Race / Ethnicity',
-      'group_type' => 'Type of Group',
-      'location' => 'Location',
+      // 'group_type' => 'Type of Group',
+      // 'location' => 'Location',
       ),
     '#attributes' => array('placeholder' => t('Filter on ...'), 'style' => ''),
     );
@@ -1347,14 +1347,14 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
   if($passed_component_type === 'prompt_question') $length = '&rows=50';
 
   // $get_status = $_GET['status'];
-  $status = isset($_GET['status']) ? '&status=' . $_GET['status'] : '';
-  $status = !empty($passed_status) ? '&status=' . $passed_status : $status;
+  $get_status = isset($_GET['status']) ? $_GET['status'] : '';
+  $status = '&status=' . (!empty($passed_status) ? $passed_status : $get_status);
 
   // Custom status for gallery tags
   if($passed_component_type === 'gallery_tag') $status = 'status=1';
 
-  $gallery_tag_id = filter_input(INPUT_GET, 'gallery_tag_id', FILTER_SANITIZE_STRING);
-  $gallery_tag_id = !empty($gallery_tag_id) ? '&galleryTagId=' . $gallery_tag_id : '';
+  $get_gallery_tag_id = filter_input(INPUT_GET, 'gallery_tag_id', FILTER_SANITIZE_STRING);
+  $gallery_tag_id = !empty($get_gallery_tag_id) ? '&galleryTagId=' . $get_gallery_tag_id : '';
   $gallery_tag_id = !empty($passed_gallery_tagId) ? '&galleryTagId=' . $passed_gallery_tagId : $gallery_tag_id;
 
   $component_type = filter_input(INPUT_GET, 'component_type', FILTER_SANITIZE_STRING);
@@ -1383,22 +1383,15 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
   $fq = array();
   if(isset($get_search_field) && !empty($get_search_field)) {
     switch ($get_search_field) {
-      case 'prompt_question':
-      $matching_questions_ids = _miss_reflections_booth_get_prompt_question_id( $get_search_value, $gallery_tag_id );
-      foreach ($matching_questions_ids as $value) {
-        array_push( $fq, 'promptquestionid:' . $value );
-      }
-      break;
+      // case 'prompt_question':
+      // $matching_questions_ids = _miss_reflections_booth_get_prompt_question_id( $get_search_value, $gallery_tag_id );
+      // foreach ($matching_questions_ids as $value) {
+      //   array_push( $fq, 'promptquestionid:' . $value );
+      // }
+      // break;
       case 'status':
         if (strpos('Featured', $get_search_value) !== false) {
           array_push($fq, 'featured:true');
-        }
-        if (strpos('Approved', $get_search_value) !== false) {
-          array_push($fq, 'status:0');
-          array_push($fq, 'featured:false');
-        }
-        if (strpos('Pending', $get_search_value) !== false) {
-          array_push($fq, 'status:1');
         }
         if (strpos('Deletion is Recommended', $get_search_value) !== false) {
           array_push($fq, 'deletionrecommendation:true');
@@ -1423,10 +1416,10 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
       // case 'group_type':
       // $fq = array('group_type:' . $get_search_value);
       // break;
-      case 'location':
-      array_push($fq, 'location:' . $get_search_value);
-      array_push($fq, 'region:' . $get_search_value);
-      break;
+      // case 'location':
+      // array_push($fq, 'location:' . $get_search_value);
+      // array_push($fq, 'region:' . $get_search_value);
+      // break;
     }
   }
 
@@ -1560,8 +1553,11 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
     }
 
     $data['data'] = $result;
+    // total number of videos returned to by the request
     $data['recordsTotal'] = count($items['rows']);
-    $data['recordsFiltered'] = $items['componentCount'];
+    // total number of videos for the entire gallery (of the appropriate status)
+    $data['recordsFiltered'] = $items['rowCount'];
+
 
     if(!$json || $dump) {
       return $data;
