@@ -3,6 +3,91 @@
 /**
  * Implements hook_form().
  */
+function miss_reflections_booth_daterange_form() {
+
+  $form = array();
+
+  $form['daterange'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Search By Date Range',
+    '#attributes' => array('class' => array('container-inline')),
+  );
+
+  // Start date
+  $form['daterange']['startDate'] = array(
+    '#type' => 'date_popup',
+    '#title' => t('Start Date'),
+    '#size' => 10,
+    '#required' => TRUE,
+    '#date_format' => 'Y-m-d',
+    '#attached' => array(
+      'library' => array(
+        array('system', 'ui.datepicker'),
+      ),
+    ),
+  );
+
+  // End date
+  $form['daterange']['endDate'] = array(
+    '#type' => 'date_popup',
+    '#title' => t('End Date'),
+    '#size' => 10,
+    '#required' => TRUE,
+    '#date_format' => 'Y-m-d',
+    '#attached' => array(
+      'library' => array(
+        array('system', 'ui.datepicker'),
+      ),
+    ),
+  );
+
+  $form['daterange']['search_daterange'] = array(
+    '#type' => 'submit',
+    '#name' => 'search_daterange',
+    '#value' => 'Filter by Date Range',
+    '#attributes' => array('style' => 'background: #008cba; color: #fff; -webkit-border-radius: 0; border-radius: 0;'),
+  );
+
+  $add_js = '
+    jQuery(document).ready(function() {
+      jQuery("#edit-search-daterange").hover(
+      function() {
+        jQuery("#edit-search-daterange").css("background", "#0079a1")
+      },
+      function() {
+        jQuery("#edit-search-daterange").css("background", "#008cba")
+      }
+      );
+    });
+ ';
+  drupal_add_js($add_js, 'inline');
+
+  $add_css = '
+    .form-item-startDate-date label {
+      display: none;
+    }
+    .form-item-endDate-date label {
+      display: none;
+    }
+    .form-item-startDate label {
+      float: left;
+      margin-top: 6px;
+      margin-right: 4px;
+    }
+    .form-item-endDate label {
+      float: left;
+      margin-top: 6px;
+      margin-right: 4px;
+    }
+  ';
+  drupal_add_css($add_css, 'inline');
+
+  return $form;
+}
+
+/**
+ * Implements hook_form().
+ */
 function miss_reflections_booth_search_form( $form, &$form_state ) {
   $form = array();
   $form['#tree'] = TRUE;
@@ -18,14 +103,14 @@ function miss_reflections_booth_search_form( $form, &$form_state ) {
     '#title' => t('Field'),
     '#multiple' => FALSE,
     '#options' => array(
-      // 'prompt_question' => 'Prompt Question',
+      'promptQuestion' => 'Prompt Question',
       'status' => 'Status',
       'reviewer' => 'Reviewer',
-      // 'tags' => 'Tags',
+      'tags' => 'Tags',
       'age' => 'Age',
       'gender' => 'Gender',
       'race' => 'Race / Ethnicity',
-      // 'group_type' => 'Type of Group',
+      'groupType' => 'Type of Group',
       'location' => 'City',
       'region' => 'State',
       ),
@@ -1065,7 +1150,7 @@ function miss_video_submissions_form_submit($form, &$form_state) {
 
   $uri = drupal_http_build_query($params);
   // Set the gallery tag, with the array of question ids, and gallery id if it exists.
-  $uri_set = 'tags=' . json_encode($tags) . '&groupType=' . json_encode($form_state['input']['groupType']) . '&' . $uri . $id;
+  $uri_set = 'tags=' . urlencode(json_encode($tags)) . '&groupType=' . urlencode(json_encode($form_state['input']['groupType'])) . '&' . $uri . $id;
 
   $set = _miss_send_miss_request( variable_get('reflectionsSetAttractVideo'), $uri_set );
   $result = _miss_video_submissions_manage_attract_media_loop($set, $form_state, $featured);
@@ -1076,12 +1161,14 @@ function miss_video_submissions_form_submit($form, &$form_state) {
   }
 
   if(!empty($result)) {
-    drupal_set_message( t('Video submission has been successfully modified.') );
+    drupal_set_message( t('<a href="/miss/manage/reflectionsBooth/videos/' . $form_state['values']['galleryTagId'] . '/' . str_replace('&id=', '', $id) . '">Video submission</a> successfully modified.') );
   } else {
     drupal_set_message( t('Could not modify the video submission. Please try again. If this persists, please contact the site administrator.'), 'error' );
   }
 
-  drupal_goto(current_path());
+  // dumper($form_state['values']['galleryTagId']);
+
+  drupal_goto('miss/manage/reflectionsBooth/videos/' . $form_state['values']['galleryTagId']);
 }
 
 /**
@@ -1266,12 +1353,20 @@ function _miss_get_gallery_data($gallery_tags = false, $path_part = false) {
 }
 
 function _miss_reflections_booth_get_prompt_question_id( $text = '', $gallery_tag_id = 0 ){
+
+  $matching_question = '';
+
   $results = _miss_send_miss_request( variable_get('reflectionsRender') );
-  $matching_questions = array();
-  foreach ($results['galleryTags'][$gallery_tag_id]['promptQuestions'] as $value) {
-    if (strpos($value['text'], $text) !== false) array_push($matching_questions, $value['id']);
+
+  if(isset($results['galleryTags'])) {
+    foreach ($results['galleryTags'] as $value) {
+      foreach ($value['promptQuestions'] as $val) {
+        if (strpos($val['text'], $text) !== false) $matching_question = $val['id'];
+      }
+    }
   }
-  return $matching_questions;
+
+  return $matching_question;
 }
 
 /**
@@ -1361,6 +1456,15 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
   $component_type = filter_input(INPUT_GET, 'component_type', FILTER_SANITIZE_STRING);
   $component_type = !empty($passed_component_type) ? $passed_component_type : $component_type;
 
+  $get_start_date = filter_input(INPUT_GET, 'startDate', FILTER_SANITIZE_STRING);
+  $get_end_date = filter_input(INPUT_GET, 'endDate', FILTER_SANITIZE_STRING);
+
+  // Date range
+  $date_range = '';
+  if(!empty($get_start_date) && !empty($get_end_date)) {
+    $date_range = '&dateRange=' . $get_start_date . ',' . $get_end_date . ' 23:59:59';
+  }
+
   $sort = 'lastTimeUpdated';
 
   if(isset($_GET['order']) && !empty($_GET['order'])) {
@@ -1381,14 +1485,12 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
   $get_search_value = filter_input(INPUT_GET, 'search_value', FILTER_SANITIZE_STRING);
 
   $fq = array();
-  if(isset($get_search_field) && !empty($get_search_field)) {
+  if(isset($get_search_field) && !empty($get_search_field) && !empty($get_search_value)) {
     switch ($get_search_field) {
-      // case 'prompt_question':
-      // $matching_questions_ids = _miss_reflections_booth_get_prompt_question_id( $get_search_value, $gallery_tag_id );
-      // foreach ($matching_questions_ids as $value) {
-      //   array_push( $fq, 'promptquestionid:' . $value );
-      // }
-      // break;
+      case 'promptQuestion':
+      $matching_questions_id = _miss_reflections_booth_get_prompt_question_id( $get_search_value, $gallery_tag_id );
+      array_push( $fq, 'promptQuestionId:' . $matching_questions_id );
+      break;
       case 'status':
         if (strpos('Featured', $get_search_value) !== false) {
           array_push($fq, 'featured:true');
@@ -1401,9 +1503,9 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
       case 'reviewer':
       array_push($fq, 'reviewer:' . $get_search_value);
       break;
-      // case 'tags':
-      // $fq = array('tags:' . $get_search_value);
-      // break;
+      case 'tags':
+      $fq = array('tags:' . $get_search_value . '');
+      break;
       case 'age':
       array_push($fq, 'age:' . $get_search_value);
       break;
@@ -1413,9 +1515,9 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
       case 'race':
       array_push($fq, 'race:' . $get_search_value);
       break;
-      // case 'group_type':
-      // $fq = array('group_type:' . $get_search_value);
-      // break;
+      case 'groupType':
+      $fq = array('groupType:' . $get_search_value);
+      break;
       case 'location':
       array_push($fq, 'location:' . $get_search_value);
       break;
@@ -1451,7 +1553,7 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
   }
 
   // $uri = $start . $length . $status . $gallery_tag_id . '&componentType=' . $component_type;
-   $uri = $start . $length . $status . $gallery_tag_id . '&componentType=' . $component_type . '&sort=' . $sort . '&sortDir=' . $sortDir . '&renderAsArray=true';
+  $uri = $start . $length . $status . $gallery_tag_id . '&componentType=' . $component_type . '&sort=' . $sort . '&sortDir=' . $sortDir . $date_range . '&renderAsArray=true';
 
   // only add fq onto the query uri if it is not empty
   if (!empty($fq)){
@@ -1463,6 +1565,12 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
 
   // Get the components.
   $items = _miss_send_miss_request( $endpoint, $uri );
+
+  // if($endpoint === 'miss/v1.0/nmaahc/reflections_booth/getVideoSubmissions.htm') {
+  //   dumper($endpoint,0);
+  //   dumper($uri,0);
+  //   dumper(json_encode($items));
+  // }
 
   switch($component_type) {
 
@@ -1959,6 +2067,7 @@ function _miss_reflections_booth_page_build($interactive = '') {
 
             // DIV
           drupal_add_library('system', 'ui.tabs');
+          drupal_add_library('system', 'ui.datepicker');
 
           $tabs_script = '
           jQuery(document).ready(function() {
@@ -1969,6 +2078,9 @@ function _miss_reflections_booth_page_build($interactive = '') {
           });
           ';
           drupal_add_js($tabs_script, 'inline');
+
+          $date_range_form = drupal_get_form('miss_reflections_booth_daterange_form');
+          $out .= drupal_render($date_range_form);
 
           $search_form = drupal_get_form('miss_reflections_booth_search_form');
           $out .= drupal_render($search_form);

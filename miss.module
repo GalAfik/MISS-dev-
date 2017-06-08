@@ -832,14 +832,18 @@ function _miss_data_backups_create_backups() {
 
   // Backup "component" JSON files for each interactive.
   foreach($edan_routes_array as $key => $value) {
-    $components = array();
-    $components = _miss_send_miss_request( 'miss/v1.0/nmaahc/' . $key . '/getComponents.htm' );
-    $fp = fopen($backup_files_path . $file_names_array['components'] . $key . '.json', 'w');
-    fwrite($fp, json_encode($components, JSON_PRETTY_PRINT));
-    fclose($fp);
-    // Set an error if the backup file could not be saved.
-    if(!file_exists($backup_files_path . $file_names_array['components'] . $key . '.json')) {
-      $data['errors'][$key] = 'Could not save the ' . $key . ' backup file.';
+
+    // Don't create a backup of Reflections Booth component.
+    if($key !== 'reflections_booth') {
+      $components = array();
+      $components = _miss_send_miss_request( 'miss/v1.0/nmaahc/' . $key . '/getComponents.htm' );
+      $fp = fopen($backup_files_path . $file_names_array['components'] . $key . '.json', 'w');
+      fwrite($fp, json_encode($components, JSON_PRETTY_PRINT));
+      fclose($fp);
+      // Set an error if the backup file could not be saved.
+      if(!file_exists($backup_files_path . $file_names_array['components'] . $key . '.json')) {
+        $data['errors'][$key] = 'Could not save the ' . $key . ' backup file.';
+      }
     }
   }
 

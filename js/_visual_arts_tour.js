@@ -757,15 +757,20 @@ jQuery(document).ready(function($) {
    * Check to see if a file request throws a 200.
    */
   function getFileStatus(url) {
+
+    url = url.replace('http://ids.si.edu/', 'https://ids.si.edu/');
+
     var http = new XMLHttpRequest();
     http.open('HEAD', url, false); // false = synchronous
     http.send(null); // It will stop here until this http request is complete.
+
     // If we get here, we already have a response, since it's synchronous XHR.
     if(http.status === 200) {
       return true;
     } else {
       return false;
     }
+    
   }
 
   /**

@@ -167,11 +167,14 @@ jQuery(document).ready(function($) {
   $('#edit-search-search-filter').on('click', function(e){
     e.preventDefault();
     var search_field = $('#edit-search-search-column').val(),
-        search_value = $('#edit-search-search-term').val();
+        search_value = $('#edit-search-search-term').val(),
+        startDate = $('#edit-startdate-datepicker-popup-0').val(),
+        endDate = $('#edit-enddate-datepicker-popup-0').val();
 
-    $('#browse_reflections_booth_videos').data('dt_params', { search_field: search_field, search_value: search_value });
+    // Set the parameters for the FQ-based filters, adding values from the date range filter.
+    $('#browse_reflections_booth_videos').data('dt_params', { search_field: search_field, search_value: search_value, startDate: startDate, endDate: endDate });
     $('#browse_reflections_booth_videos').DataTable().draw();
-    $('#browse_reflections_booth_videos_unapproved').data('dt_params', { search_field: search_field, search_value: search_value });
+    $('#browse_reflections_booth_videos_unapproved').data('dt_params', { search_field: search_field, search_value: search_value, startDate: startDate, endDate: endDate });
     $('#browse_reflections_booth_videos_unapproved').DataTable().draw();
   });
 
@@ -179,10 +182,28 @@ jQuery(document).ready(function($) {
   // custom filters need to be removed from the afnFiltering array.
   $('#edit-search-search-clear').on('click', function(e){
     e.preventDefault();
+    var startDate = $('#edit-startdate-datepicker-popup-0').val(),
+        endDate = $('#edit-enddate-datepicker-popup-0').val();
+        
     $('#edit-search-search-term').val('');
-    $('#browse_reflections_booth_videos').data('dt_params', { search_field: '', search_value: '' });
+    $('#browse_reflections_booth_videos').data('dt_params', { search_field: '', search_value: '', startDate: startDate, endDate: endDate });
     $('#browse_reflections_booth_videos').DataTable().draw();
-    $('#browse_reflections_booth_videos_unapproved').data('dt_params', { search_field: '', search_value: '' });
+    $('#browse_reflections_booth_videos_unapproved').data('dt_params', { search_field: '', search_value: '', startDate: startDate, endDate: endDate });
+    $('#browse_reflections_booth_videos_unapproved').DataTable().draw();
+  });
+
+  // on filter by date range button click, set the start and end dates and load a new ajax call
+  $('#edit-search-daterange').on('click', function(e){
+    e.preventDefault();
+    var startDate = $('#edit-startdate-datepicker-popup-0').val(),
+        endDate = $('#edit-enddate-datepicker-popup-0').val(),
+        search_field = $('#edit-search-search-column').val(),
+        search_value = $('#edit-search-search-term').val();
+
+    // Set the parameters for the date range, adding any values from the FQ-based filters.
+    $('#browse_reflections_booth_videos').data('dt_params', { startDate: startDate, endDate: endDate, search_field: search_field, search_value: search_value });
+    $('#browse_reflections_booth_videos').DataTable().draw();
+    $('#browse_reflections_booth_videos_unapproved').data('dt_params', { startDate: startDate, endDate: endDate, search_field: search_field, search_value: search_value });
     $('#browse_reflections_booth_videos_unapproved').DataTable().draw();
   });
 
