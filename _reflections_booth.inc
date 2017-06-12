@@ -13,6 +13,15 @@ function miss_reflections_booth_daterange_form() {
     '#attributes' => array('class' => array('container-inline')),
   );
 
+  $form['daterange']['dateType'] = array(
+    '#type' => 'select',
+    '#multiple' => FALSE,
+    '#options' => array(
+      'timestamp' => 'Created',
+      'lastTimeUpdated' => 'Last Updated',
+      ),
+    );
+
   // Start date
   $form['daterange']['startDate'] = array(
     '#type' => 'date_popup',
@@ -1467,6 +1476,7 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
   $component_type = filter_input(INPUT_GET, 'component_type', FILTER_SANITIZE_STRING);
   $component_type = !empty($passed_component_type) ? $passed_component_type : $component_type;
 
+  $get_date_type = filter_input(INPUT_GET, 'dateType', FILTER_SANITIZE_STRING);
   $get_start_date = filter_input(INPUT_GET, 'startDate', FILTER_SANITIZE_STRING);
   $get_end_date = filter_input(INPUT_GET, 'endDate', FILTER_SANITIZE_STRING);
 
