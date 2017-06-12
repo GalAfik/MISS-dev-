@@ -508,7 +508,7 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
 
     $form['moderationField']['moderationHelptext'] = array(
       '#type' => 'fieldset',
-      '#title' => '&#x2753 Deletion Recommendation Guidelines Below',
+      '#title' => '&#x2753 Deletion Recommendation Guidelines',
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
       );
@@ -621,15 +621,15 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
 
     $form['reviewerSection']['commentsHelptext']['text'] = array(
       '#type' => 'item',
-      '#markup' => '<i><p>In the box below, write a summary of the topics/themes covered in the recording.In your brief summary, please make note of the following features, if present:</p>
+      '#markup' => '<i><p>In the box below, write a summary of the topics/themes covered in the recording. In your brief summary, please make note of the following features, if present:</p>
       <ol>
-        <li>Visitor shares memory of a significant historical event, movement, or era (slavery, abolitionism, Civil Rights, Black Power, Black Lives Matter, etc...)</li>
-        <li>Visitor describes a family tradition or detailed genealogy (Juneteenth, Homecoming, family tree)</li>
-        <li>Visitors recalls personal experiencein a significant event of the modern era (Grand Opening of NMAAHC, Inauguration, Women’s march, Science March, etc...)</li>
+        <li>Visitor shares memory of a significant historical event, movement, or era (slavery, abolitionism, Civil Rights, Black Power, Black Lives Matter, etc...).</li>
+        <li>Visitor describes a family tradition or detailed genealogy (Juneteenth, Homecoming, family tree).</li>
+        <li>Visitors recalls personal experiencein a significant event of the modern era (Grand Opening of NMAAHC, Inauguration, Women’s march, Science March, etc...).</li>
         <li>Visitor describes a familial connection to a significant place of location-such as one of the many places featured in our galleries (Tulsa, Edisto, The Bronx).</li>
         <li>Visitor mentions artifacts, documents, or photographs potentially available to the Museum.</li>
-        <li>Visitor makes a particularly insightful comment about the exhibition itself; things they like, dislike, are confused by, are sure to remember, etc....not general or non-specific comments like “I like it.”</li>
-        <li>Visitor shares a particularly poignant comment or memory (ofcourse, this is your subjective judgement).</li>
+        <li>Visitor makes a particularly insightful comment about the exhibition itself; things they like, dislike, are confused by, are sure to remember, etc.... not general or non-specific comments like “I like it.”</li>
+        <li>Visitor shares a particularly poignant comment or memory (of course, this is your subjective judgement).</li>
       </ol>
     </i>',
     );
@@ -650,6 +650,15 @@ function miss_video_submissions_form( $form, &$form_state, $record = array(), $a
       '#title' => t('Editor Comments'),
       '#resizable' => TRUE,
       '#default_value' => !empty($record['comments']) ? $record['comments'] : '',
+      '#format' => 'full_html',
+      '#disabled' => (user_access('edit reflections booth content') || user_access('review reflections booth content')) ? FALSE : TRUE,
+      );
+
+    $form['reviewerSection']['artifact'] = array(
+      '#type' => 'text_format',
+      '#title' => t('Artifact'),
+      '#resizable' => TRUE,
+      '#default_value' => !empty($record['artifact']) ? $record['artifact'] : '',
       '#format' => 'full_html',
       '#disabled' => (user_access('edit reflections booth content') || user_access('review reflections booth content')) ? FALSE : TRUE,
       );
@@ -958,6 +967,7 @@ function _miss_reflections_booth_tags_field_options() {
   return array(
     'Activism' => 'Activism',
     'Africa & The Diaspora' => 'Africa & The Diaspora',
+    'Artifact' => 'Artifact',
     'Black Power' => 'Black Power',
     'Civil Rights' => 'Civil Rights',
     'Communities' => 'Communities',
@@ -1123,6 +1133,7 @@ function miss_video_submissions_form_submit($form, &$form_state) {
   global $user;
   $params = array(
     'comments' => $form_state['values']['comments']['value'],
+    'artifact' => $form_state['values']['artifact']['value'],
     'age' => $form_state['values']['age'],
     'gender' => $form_state['values']['gender'],
     'race' => $form_state['values']['race'],
@@ -1498,6 +1509,12 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
         if (strpos('Deletion is Recommended', $get_search_value) !== false) {
           array_push($fq, 'deletionrecommendation:true');
         }
+        if (strpos('Reviewed', $get_search_value) !== false) {
+          array_push($fq, 'reviewer:*');
+        }
+        if (strpos('Pending Review', $get_search_value) !== false) {
+          array_push($fq, 'reviewer:\"\"');
+        }
       break;
       // must match exactly
       case 'reviewer':
@@ -1600,22 +1617,40 @@ function _miss_rb_video_submissions_callback($json = TRUE, $passed_gallery_tagId
     }
 
     $i = 0;
-        // All videos.
+    // All videos.
     foreach($items['rows'] as $record_value) {
 
       $result[$i] = $record_value;
 
           // Set the status of the item.
-      $result[$i]['content_processed']['status'] = (isset($record_value['content']['featured']) && $record_value['content']['featured']) ? '<span style="color: #069E2D;font-weight:bold;">Featured</span>' : ($record_value['status'] == 0 ? 'Approved' : 'Pending');
+      $result[$i]['content_processed']['status'] = '';
+
+      if ($record_value['status'] == 0) {
+        $result[$i]['content_processed']['status'] = 'Approved';
+        if (isset($record_value['content']['featured']) && $record_value['content']['featured']) {
+          $result[$i]['content_processed']['status'] = '<span style="color: #069E2D;font-weight:bold;">Featured</span>';
+        }
+      }else{
+        if (isset($record_value['content']['reviewer'])) {
+          $result[$i]['content_processed']['status'] = 'Reviewed';
+        }else{
+          $result[$i]['content_processed']['status'] = 'Pending Review';
+        }
+      }
 
       $result[$i]['content_processed']['status'] .= (isset($record_value['content']['deletionRecommendation']) && $record_value['content']['deletionRecommendation']) ? ' <span style="color: red;">(Deletion is Recommended)</span>' : '';
 
-          // Get timestamp for the table.
-      $time = (isset($record_value['lastTimeUpdated']) && $record_value['lastTimeUpdated']) ? $record_value['lastTimeUpdated'] : 'N/A';
+      // Get timestamp for the table.
+      $time = (isset($record_value['timestamp']) && $record_value['timestamp']) ? $record_value['timestamp'] : 'N/A';
       $datetime = DateTime::createFromFormat( 'Y-m-d H:i:s.u', $time, new DateTimeZone('America/New_York'));
       $result[$i]['content_processed']['timestamp'] = $datetime->format('m/d/Y g:i A');
 
-        // $result[$i]['content_processed']['timestamp'] = $time;
+      // Get lastTimeUpdated for the table.
+      $time = (isset($record_value['lastTimeUpdated']) && $record_value['lastTimeUpdated']) ? $record_value['lastTimeUpdated'] : 'N/A';
+      $datetime = DateTime::createFromFormat( 'Y-m-d H:i:s.u', $time, new DateTimeZone('America/New_York'));
+      $result[$i]['content_processed']['lastTimeUpdated'] = $datetime->format('m/d/Y g:i A');
+
+      // $result[$i]['content_processed']['timestamp'] = $time;
 
       $result[$i]['content_processed']['thumb'] = (isset($record_value['content']['videoThumbnailImageUrl']) && !empty($record_value['content']['videoThumbnailImageUrl']))
       ? '<img src="' . $record_value['content']['videoThumbnailImageUrl'] . '" alt="Thumbnail image file">'
@@ -2101,7 +2136,8 @@ function _miss_reflections_booth_page_build($interactive = '') {
           $out .= '<th width="12%" class="no-sort" style="text-align: center;">Thumbnail Image</th>' . "\n";
           $out .= '<th width="50%">Prompt Question</th>' . "\n";
           $out .= '<th width="10%" style="text-align: center;">Status</th>' . "\n";
-          $out .= '<th width="20%" style="text-align: center;">Timestamp</th>' . "\n";
+          $out .= '<th width="20%" style="text-align: center;">Created</th>' . "\n";
+          $out .= '<th width="20%" style="text-align: center;">Last Updated</th>' . "\n";
           $out .= '<th width="10%" style="text-align: center;">Reviewer</th>' . "\n";
           $out .= '<th width="10%" style="text-align: center;">Tags</th>' . "\n";
           $out .= '<th width="10%" style="text-align: center;">Age</th>' . "\n";
@@ -2123,7 +2159,8 @@ function _miss_reflections_booth_page_build($interactive = '') {
           $out .= '<th width="12%" class="no-sort" style="text-align: center;">Thumbnail Image</th>' . "\n";
           $out .= '<th width="50%">Prompt Question</th>' . "\n";
           $out .= '<th width="10%" style="text-align: center;">Status</th>' . "\n";
-          $out .= '<th width="20%" style="text-align: center;">Timestamp</th>' . "\n";
+          $out .= '<th width="20%" style="text-align: center;">Created</th>' . "\n";
+          $out .= '<th width="20%" style="text-align: center;">Last Updated</th>' . "\n";
           $out .= '<th width="10%" style="text-align: center;">Reviewer</th>' . "\n";
           $out .= '<th width="10%" style="text-align: center;">Tags</th>' . "\n";
           $out .= '<th width="10%" style="text-align: center;">Age</th>' . "\n";

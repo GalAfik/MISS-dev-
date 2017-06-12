@@ -103,6 +103,7 @@ jQuery(document).ready(function($) {
     { "data": "content_processed.question" },
     { "data": "content_processed.status" },
     { "data": "content_processed.timestamp" },
+    { "data": "content_processed.lastTimeUpdated" },
     { "data": "content_processed.reviewer" },
     { "data": "content_processed.tags" },
     { "data": "content_processed.age" },
@@ -119,7 +120,7 @@ jQuery(document).ready(function($) {
       'sortable' : true,
       // Disable sorting on the columns 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11.
       'sortable' : false,
-      'targets' : [ 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11 ]
+      'targets' : [ 0, 1, 2, 5, 6, 7, 8, 9, 10, 11, 12 ]
       // Apply classes.
       // {'targets': [ 0, 2 ], className: 'centered-table-cell'}
     } ],
@@ -129,13 +130,13 @@ jQuery(document).ready(function($) {
     "ajax": {
       "url": "/miss/reflections-booth/ajax",
       "data": function ( d ) {
-        d.gallery_tag_id = galleryTagId;
-        d.status = '0';
-
         // Retrieve dynamic parameters
         var dt_params = $('#browse_reflections_booth_videos').data('dt_params');
         // Add dynamic parameters to the data object sent to the server
         if(dt_params){ $.extend(d, dt_params); }
+        d.gallery_tag_id = galleryTagId;
+        d.status = '0';
+
       }
     },
     // Method type.
@@ -154,9 +155,9 @@ jQuery(document).ready(function($) {
     "rowCallback": function( row, data, index ) {
       // Add the edit link.
       var recordLink = $('<a />').attr('href', '/miss/manage/reflectionsBooth/videos/' + data.content_processed.galleryTagId + '/' + data.content_processed.recordId).text('Edit');
-      $(row).find('td:eq(11)').html(recordLink);
+      $(row).find('td:eq(12)').html(recordLink);
       if(data.content_processed.deletionRecommendation == true){
-        for (var i = 0; i <= 11; i++) {
+        for (var i = 0; i <= 12; i++) {
           $(row).find('td:eq(' + i + ')').css('background-color', '#FFCCCB');
         }
       }
@@ -184,7 +185,7 @@ jQuery(document).ready(function($) {
     e.preventDefault();
     var startDate = $('#edit-startdate-datepicker-popup-0').val(),
         endDate = $('#edit-enddate-datepicker-popup-0').val();
-        
+
     $('#edit-search-search-term').val('');
     $('#browse_reflections_booth_videos').data('dt_params', { search_field: '', search_value: '', startDate: startDate, endDate: endDate });
     $('#browse_reflections_booth_videos').DataTable().draw();
@@ -221,6 +222,7 @@ jQuery(document).ready(function($) {
     { "data": "content_processed.question" },
     { "data": "content_processed.status" },
     { "data": "content_processed.timestamp" },
+    { "data": "content_processed.lastTimeUpdated" },
     { "data": "content_processed.reviewer" },
     { "data": "content_processed.tags" },
     { "data": "content_processed.age" },
@@ -237,7 +239,7 @@ jQuery(document).ready(function($) {
       'sortable' : true,
       // Disable sorting on the columns 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11.
       'sortable' : false,
-      'targets' : [ 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11 ]
+      'targets' : [ 0, 1, 2, 5, 6, 7, 8, 9, 10, 11, 12 ]
       // Apply classes.
       // {'targets': [ 0, 2 ], className: 'centered-table-cell'}
     } ],
@@ -247,13 +249,13 @@ jQuery(document).ready(function($) {
     "ajax": {
       "url": "/miss/reflections-booth/ajax",
       "data": function ( d ) {
-        d.gallery_tag_id = galleryTagId;
-        d.status = '1';
-
         // Retrieve dynamic parameters
         var dt_params = $('#browse_reflections_booth_videos_unapproved').data('dt_params');
         // Add dynamic parameters to the data object sent to the server
         if(dt_params){ $.extend(d, dt_params); }
+        d.gallery_tag_id = galleryTagId;
+        d.status = '1';
+
       }
     },
     // Method type.
@@ -272,9 +274,9 @@ jQuery(document).ready(function($) {
     "rowCallback": function( row, data, index ) {
       // Add the edit link.
       var recordLink = $('<a />').attr('href', '/miss/manage/reflectionsBooth/videos/' + data.content_processed.galleryTagId + '/' + data.content_processed.recordId).text('Edit');
-      $(row).find('td:eq(11)').html(recordLink);
+      $(row).find('td:eq(12)').html(recordLink);
       if(data.content_processed.deletionRecommendation == true){
-        for (var i = 0; i <= 11; i++) {
+        for (var i = 0; i <= 12; i++) {
           $(row).find('td:eq(' + i + ')').css('background-color', '#FFCCCB');
         }
       }
